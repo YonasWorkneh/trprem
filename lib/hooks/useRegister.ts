@@ -14,7 +14,7 @@ interface UseRegisterResult {
   register: (
     credentials: RegisterCredentials,
     method: RegisterMethod
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   loading: boolean;
   error: string | null;
 }
@@ -27,7 +27,7 @@ export function useRegister(): UseRegisterResult {
   const register = async (
     credentials: RegisterCredentials,
     method: RegisterMethod
-  ): Promise<void> => {
+  ): Promise<boolean> => {
     setLoading(true);
     setError(null);
 
@@ -41,24 +41,16 @@ export function useRegister(): UseRegisterResult {
       }
 
       if (result.success && result.data) {
-        // Redirect to confirmation page with email or phone
-        const email = credentials.email;
-        const phone = credentials.phone;
-        
-        if (email) {
-          router.push(`/confirm-email?email=${encodeURIComponent(email)}`);
-        } else if (phone) {
-          router.push(`/confirm-email?phone=${encodeURIComponent(phone)}`);
-        } else {
-          router.push("/login");
-        }
+        return true;
       } else {
         setError(result.error || "Registration failed");
+        return false;
       }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"
       );
+      return false;
     } finally {
       setLoading(false);
     }
