@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import AuthLayout from "@/app/components/auth/AuthLayout";
-import { resendConfirmationEmail } from "@/lib/services/authService";
+import { resendConfirmationEmail } from "@/lib/services/authService"; // <-- import your existing service
 import { ArrowLeftIcon } from "lucide-react";
 
 export const dynamic = "force-dynamic";
@@ -18,21 +18,15 @@ export default function ConfirmEmailPage() {
   const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
+    if (!searchParams) return;
+
     const emailParam = searchParams.get("email");
     const phoneParam = searchParams.get("phone");
-    
-    if (emailParam) {
-      setTimeout(() => {
-        setEmail(emailParam);
-      }, 0);
-    } else if (phoneParam) {
-      setTimeout(() => {
-        setPhone(phoneParam);
-      }, 0);
-    } else {
-      // If no email or phone, redirect to register
-      router.push("/register");
-    }
+
+    // setTimeout(() => {
+    //   setEmail(emailParam||null);
+    //   setPhone(phoneParam||null);
+    // }, 0);
   }, [searchParams, router]);
 
   const handleResendEmail = async () => {
@@ -40,7 +34,7 @@ export default function ConfirmEmailPage() {
 
     setIsResending(true);
     const result = await resendConfirmationEmail(email);
-    
+
     if (result.success) {
       toast.success("Confirmation email sent", {
         description: "Please check your inbox",
@@ -50,16 +44,14 @@ export default function ConfirmEmailPage() {
         description: result.error || "Please try again later",
       });
     }
-    
+
     setIsResending(false);
   };
 
-  if (!email && !phone) {
-    return null;
-  }
+  if (!email && !phone) return null;
 
   return (
-   <AuthLayout showFooter={false} showLogo={false}>
+    <AuthLayout showFooter={false} showLogo={false}>
       <div className="w-full max-w-md mx-auto">
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
@@ -84,54 +76,34 @@ export default function ConfirmEmailPage() {
           <p className="text-sm text-gray-600">
             We&apos;ve sent a confirmation {email ? "email" : "message"} to
           </p>
-          <p className="text-sm font-medium text-gray-900 mt-1">
-            {email || phone}
-          </p>
+          <p className="text-sm font-medium text-gray-900 mt-1">{email || phone}</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                <span className="text-blue-600 text-xs font-bold">1</span>
+            {[{
+              step: 1,
+              title: `Open your ${email ? "email" : "messages"}`,
+              description: "Look for a message from tradepremium"
+            }, {
+              step: 2,
+              title: "Click the confirmation link",
+              description: "This will verify your account and activate it"
+            }, {
+              step: 3,
+              title: "Return here to sign in",
+              description: "Once confirmed, you can log in to your account"
+            }].map(item => (
+              <div key={item.step} className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
+                  <span className="text-blue-600 text-xs font-bold">{item.step}</span>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-900">{item.title}</p>
+                  <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                </div>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  Open your {email ? "email" : "messages"}
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Look for a message from tradeprememium
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                <span className="text-blue-600 text-xs font-bold">2</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  Click the confirmation link
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  This will verify your account and activate it
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                <span className="text-blue-600 text-xs font-bold">3</span>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-gray-900">
-                  Return here to sign in
-                </p>
-                <p className="text-sm text-gray-600 mt-1">
-                  Once confirmed, you can log in to your account
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
@@ -155,7 +127,7 @@ export default function ConfirmEmailPage() {
 
           <Link
             href="/"
-            className="w-full text-center text-sm text-gray-600 hover:text-gray-900 py-2 flex items-center justify-center gap-2 underline underline-offset-4" 
+            className="w-full text-center text-sm text-gray-600 hover:text-gray-900 py-2 flex items-center justify-center gap-2 underline underline-offset-4"
           >
             <ArrowLeftIcon className="w-4 h-4" />
             <span>Back to home</span>
