@@ -38,8 +38,11 @@ export default function ProfileHeader({
           </svg>
         </button>
         <button
-          onClick={onLogout}
-          className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+          onClick={()=>{
+            console.log("log out button clicked");
+            onLogout?.();
+          }}
+          className="p-2 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
           aria-label="Logout"
         >
           <svg

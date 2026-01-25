@@ -55,6 +55,56 @@ export async function fetchMarketData(): Promise<FetchMarketDataResult> {
   }
 }
 
+export async function fetchCoinById(
+  coinId: string
+): Promise<{ data: MarketData | null; error: Error | null }> {
+  try {
+    const url = new URL(`${COINGECKO_API_BASE}/coins/markets`);
+    url.searchParams.append("vs_currency", "usd");
+    url.searchParams.append("ids", coinId);
+    url.searchParams.append("sparkline", "true");
+    url.searchParams.append("price_change_percentage", "24h");
+
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch coin data: ${response.statusText}`);
+    }
+
+    const rawData: CoinGeckoMarketData[] = await response.json();
+
+    if (rawData.length === 0) {
+      return { data: null, error: null };
+    }
+
+    const item = rawData[0];
+    const marketData: MarketData = {
+      id: item.id,
+      symbol: item.symbol.toUpperCase(),
+      name: item.name,
+      image: item.image,
+      currentPrice: item.current_price,
+      priceChange24h: item.price_change_24h,
+      priceChangePercentage24h: item.price_change_percentage_24h,
+      high24h: item.high_24h,
+      low24h: item.low_24h,
+      totalVolume: item.total_volume,
+      marketCap: item.market_cap,
+      marketCapRank: item.market_cap_rank,
+      sparklineData: item.sparkline_in_7d?.price || [],
+    };
+
+    return { data: marketData, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("Unknown error"),
+    };
+  }
+}
+
 export function filterMarketData(
   data: MarketData[],
   filter: "hot" | "24h-list" | "rise" | "loss"

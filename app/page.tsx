@@ -47,11 +47,11 @@ export default function Page() {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header title="trade prememium" />
-        <main className="flex-1 pb-20 flex items-center justify-center">
+        <main className="flex-1 pb-20 px-4 flex items-center justify-center">
           <div className="text-gray-500">Loading...</div>
         </main>
         <BottomNavigation />

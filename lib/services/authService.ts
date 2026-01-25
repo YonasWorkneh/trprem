@@ -6,6 +6,7 @@ import type {
   AuthResult,
   Profile,
 } from "../types/auth";
+import { setStoredAuth } from "../utils/authStorage";
 
 export async function loginWithEmail(
   email: string,
@@ -24,12 +25,23 @@ export async function loginWithEmail(
       };
     }
 
-    if (!data.user) {
+    if (!data.user || !data.session) {
       return {
         success: false,
         error: "Authentication failed",
       };
     }
+
+    // Store auth in localStorage
+    setStoredAuth(
+      data.session.access_token,
+      {
+        id: data.user.id,
+        email: data.user.email || undefined,
+        phone: data.user.phone || undefined,
+      },
+      null
+    );
 
     return {
       success: true,
@@ -67,12 +79,23 @@ export async function loginWithPhone(
       };
     }
 
-    if (!data.user) {
+    if (!data.user || !data.session) {
       return {
         success: false,
         error: "Authentication failed",
       };
     }
+
+    // Store auth in localStorage
+    setStoredAuth(
+      data.session.access_token,
+      {
+        id: data.user.id,
+        email: data.user.email || undefined,
+        phone: data.user.phone || undefined,
+      },
+      null
+    );
 
     return {
       success: true,
@@ -249,6 +272,14 @@ export async function resendConfirmationEmail(
 export async function logout(): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await supabase.auth.signOut();
+
+    // Clear localStorage on logout
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("tp_auth_token");
+      localStorage.removeItem("tp_auth_user");
+      localStorage.removeItem("tp_auth_profile");
+      localStorage.removeItem("tp_auth_timestamp");
+    }
 
     if (error) {
       return {

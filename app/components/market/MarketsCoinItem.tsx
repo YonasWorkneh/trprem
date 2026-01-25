@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import type { MarketData } from "@/lib/types/market";
 
 interface MarketsCoinItemProps {
@@ -29,7 +32,10 @@ export default function MarketsCoinItem({ data }: MarketsCoinItemProps) {
   const isPositive = data.priceChangePercentage24h >= 0;
 
   return (
-    <div className="flex items-center justify-between py-4 px-4 border-b border-gray-100 hover:bg-gray-50 transition-colors">
+    <Link
+      href={`/markets/${data.id}`}
+      className="flex items-center justify-between py-4 px-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+    >
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <Image
           src={data.image}
@@ -60,6 +66,6 @@ export default function MarketsCoinItem({ data }: MarketsCoinItemProps) {
           {data.priceChangePercentage24h.toFixed(2)}%
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

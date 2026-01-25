@@ -148,10 +148,10 @@ export default function FeatureGrid() {
             <Link
               key={feature.id}
               href={feature.href}
-              className="flex flex-col items-center gap-2 p-4 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[rgba(37,99,235,0.1)] rounded-2xl border border-gray-200 hover:bg-[rgba(37,99,235,0.2)] transition-colors"
             >
-              <div className="text-gray-700">{feature.icon}</div>
-              <span className="text-xs text-gray-700 text-center font-normal">
+              <div className="text-[rgb(37,99,235)]">{feature.icon}</div>
+              <span className="text-xs text-[rgb(37,99,235)] text-center font-normal">
                 {feature.label}
               </span>
             </Link>

@@ -168,6 +168,7 @@ export default function PersonalPage() {
   };
 
   const handleLogout = async () => {
+    console.log("logging out");
     const result = await logout();
     if (result.success) {
       toast.success("Logged out successfully");
@@ -187,11 +188,11 @@ export default function PersonalPage() {
     }
   };
 
-  if (authLoading || loading) {
+  if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header title="trade prememium" />
-        <main className="flex-1 pb-20 flex items-center justify-center">
+        <main className="flex-1 pb-20 px-4 flex items-center justify-center">
           <div className="text-gray-500">Loading...</div>
         </main>
         <BottomNavigation />
@@ -203,7 +204,7 @@ export default function PersonalPage() {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header title="trade prememium" />
-        <main className="flex-1 pb-20 flex items-center justify-center">
+        <main className="flex-1 pb-20 px-4 flex items-center justify-center">
           <div className="text-center">
             <p className="text-gray-500 mb-4">Please log in to view your profile</p>
             <Link
