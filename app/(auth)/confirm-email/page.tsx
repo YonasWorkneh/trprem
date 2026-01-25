@@ -8,6 +8,8 @@ import AuthLayout from "@/app/components/auth/AuthLayout";
 import { resendConfirmationEmail } from "@/lib/services/authService";
 import { ArrowLeftIcon } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function ConfirmEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
