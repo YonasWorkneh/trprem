@@ -27,9 +27,14 @@ export interface AuthResult {
 
 export interface Profile {
   id: string;
-  email: string | null;
+  email: string;
+  name: string | null;
+  avatar_url: string | null;
   phone: string | null;
-  full_name: string | null;
-  is_verified: boolean;
+  kyc_status: "not_started" | "pending" | "verified" | "rejected";
+  role: "user" | "admin";
+  trading_balance: number;
+  preferences: Record<string, unknown>;
   created_at: string;
+  updated_at: string;
 }

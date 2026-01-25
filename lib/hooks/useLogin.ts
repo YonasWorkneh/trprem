@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import {
   loginWithEmail,
   loginWithPhone,
-  type LoginCredentials,
-  type AuthResult,
 } from "../services/authService";
+import type { LoginCredentials, AuthResult } from "../types/auth";
 
 type LoginMethod = "email" | "mobile";
 

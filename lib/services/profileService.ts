@@ -22,7 +22,7 @@ export async function getProfileData(
 ): Promise<ProfileDataResult> {
   try {
     const profileResult = await supabase
-      .from("profiles")
+      .from("users")
       .select("*")
       .eq("id", userId)
       .single();
@@ -34,28 +34,20 @@ export async function getProfileData(
       };
     }
 
+    // Get wallet balance from usdt_wallets table
     const walletResult = await supabase
-      .from("wallets")
-      .select("id")
+      .from("usdt_wallets")
+      .select("balance")
       .eq("user_id", userId)
-      .single();
+      .eq("is_active", true)
+      .maybeSingle();
 
     let totalBalance = 0;
     let assetsValue = 0;
 
     if (!walletResult.error && walletResult.data) {
-      const balancesResult = await supabase
-        .from("wallet_balances")
-        .select("available_balance")
-        .eq("wallet_id", walletResult.data.id);
-
-      if (!balancesResult.error && balancesResult.data) {
-        totalBalance = balancesResult.data.reduce(
-          (sum, balance) => sum + Number(balance.available_balance || 0),
-          0
-        );
-        assetsValue = totalBalance;
-      }
+      totalBalance = Number(walletResult.data.balance || 0);
+      assetsValue = totalBalance;
     }
 
     return {

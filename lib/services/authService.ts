@@ -2,7 +2,6 @@
 
 import { supabase } from "../supabase";
 import type {
-  LoginCredentials,
   RegisterCredentials,
   AuthResult,
   Profile,
@@ -117,7 +116,7 @@ export async function registerWithEmail(
       password: credentials.password,
       options: {
         data: {
-          full_name: credentials.fullName,
+          name: credentials.fullName,
           phone: credentials.phone || null,
         },
       },
@@ -178,7 +177,7 @@ export async function registerWithPhone(
       password: credentials.password,
       options: {
         data: {
-          full_name: credentials.fullName,
+          name: credentials.fullName,
           phone: credentials.phone,
         },
       },
@@ -206,6 +205,34 @@ export async function registerWithPhone(
           phone: data.user.phone || undefined,
         },
       },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
+  }
+}
+
+export async function resendConfirmationEmail(
+  email: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+    });
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
     };
   } catch (error) {
     return {
@@ -246,15 +273,23 @@ export async function getProfile(userId: string): Promise<{
 }> {
   try {
     const { data, error } = await supabase
-      .from("profiles")
+      .from("users")
       .select("*")
       .eq("id", userId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       return {
         success: false,
         error: error.message,
+      };
+    }
+
+    if (!data) {
+      // User record doesn't exist yet (might be created by trigger)
+      return {
+        success: false,
+        error: "User profile not found",
       };
     }
 

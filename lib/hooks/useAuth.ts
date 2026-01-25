@@ -16,14 +16,34 @@ export function useAuth() {
       try {
         const {
           data: { user },
+          error: userError,
         } = await supabase.auth.getUser();
+        
+        if (userError) {
+          setUser(null);
+          setProfile(null);
+          setLoading(false);
+          return;
+        }
+
         setUser(user);
 
         if (user) {
-          const profileResult = await getProfile(user.id);
-          if (profileResult.success && profileResult.data) {
-            setProfile(profileResult.data);
+          try {
+            const profileResult = await getProfile(user.id);
+            if (profileResult.success && profileResult.data) {
+              setProfile(profileResult.data);
+            } else {
+              // Profile might not exist yet (e.g., just signed up)
+              // This is okay, we'll show user info from auth.user
+              setProfile(null);
+            }
+          } catch (profileError) {
+            // Profile fetch failed, but we still have user
+            setProfile(null);
           }
+        } else {
+          setProfile(null);
         }
       } catch (error) {
         setUser(null);
@@ -38,20 +58,29 @@ export function useAuth() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      setUser(session?.user ?? null);
+      try {
+        setUser(session?.user ?? null);
 
-      if (session?.user) {
-        const profileResult = await getProfile(session.user.id);
-        if (profileResult.success && profileResult.data) {
-          setProfile(profileResult.data);
+        if (session?.user) {
+          try {
+            const profileResult = await getProfile(session.user.id);
+            if (profileResult.success && profileResult.data) {
+              setProfile(profileResult.data);
+            } else {
+              setProfile(null);
+            }
+          } catch (profileError) {
+            setProfile(null);
+          }
         } else {
           setProfile(null);
         }
-      } else {
+      } catch (error) {
+        setUser(null);
         setProfile(null);
+      } finally {
+        setLoading(false);
       }
-
-      setLoading(false);
     });
 
     return () => {

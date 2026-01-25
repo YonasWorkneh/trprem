@@ -11,7 +11,7 @@ interface UserInfoCardProps {
 export default function UserInfoCard({ profile, userId }: UserInfoCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const displayName = profile?.full_name || "User";
+  const displayName = profile?.name || "User";
   const initial = displayName.charAt(0).toUpperCase();
   const shortId = userId.substring(0, 8);
 

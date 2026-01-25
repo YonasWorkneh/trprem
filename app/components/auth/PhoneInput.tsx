@@ -123,12 +123,13 @@ export default function PhoneInput({
           value={value}
           onChange={(e) => onValueChange(e.target.value)}
           placeholder={placeholder}
-          className={`flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
+          className={`text-black flex-1 px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
             error ? "border-red-500" : "border-gray-300"
           }`}
         />
       </div>
       {error && <p className="text-sm text-red-500 mt-1">{error}</p>}
+      
     </div>
   );
 }

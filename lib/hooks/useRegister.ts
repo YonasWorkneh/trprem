@@ -42,7 +42,17 @@ export function useRegister(): UseRegisterResult {
       }
 
       if (result.success && result.data) {
-        router.push("/login");
+        // Redirect to confirmation page with email or phone
+        const email = credentials.email;
+        const phone = credentials.phone;
+        
+        if (email) {
+          router.push(`/confirm-email?email=${encodeURIComponent(email)}`);
+        } else if (phone) {
+          router.push(`/confirm-email?phone=${encodeURIComponent(phone)}`);
+        } else {
+          router.push("/login");
+        }
       } else {
         setError(result.error || "Registration failed");
       }

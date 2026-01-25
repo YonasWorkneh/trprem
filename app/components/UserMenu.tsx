@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { logout } from "@/lib/services/authService";
+import SideMenu from "./SideMenu";
 
 export default function UserMenu() {
   const { profile, user } = useAuth();
   const router = useRouter();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSideMenuOpen, setIsSideMenuOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const displayName = profile?.full_name || user?.email?.split("@")[0] || "User";
+  const displayName = profile?.name || user?.email?.split("@")[0] || "User";
+  const displayEmail = profile?.email || user?.email || user?.phone || "";
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -22,17 +24,21 @@ export default function UserMenu() {
       router.refresh();
     }
     setIsLoggingOut(false);
-    setIsMenuOpen(false);
   };
 
   return (
-    <div className="relative">
+    <>
       <div className="flex items-center gap-4">
         <div className="flex flex-col items-end">
-          <span className="text-base font-bold text-gray-900">{displayName}</span>
+          <div className="flex flex-col items-end">
+            <span className="text-base font-bold text-gray-900">{displayName}</span>
+          </div>
+          <div className="flex flex-col items-end">
+            <span className="text-xs text-gray-600">{displayEmail}</span>
+          </div>
         </div>
         <button
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          className="p-2 cursor-pointer rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors"
           aria-label="Email"
         >
           <svg
@@ -51,8 +57,8 @@ export default function UserMenu() {
           </svg>
         </button>
         <button
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          onClick={() => setIsSideMenuOpen(true)}
+          className="p-2 rounded-full cursor-pointer hover:bg-gray-100 flex items-center justify-center transition-colors"
           aria-label="Menu"
         >
           <svg
@@ -72,38 +78,7 @@ export default function UserMenu() {
           </svg>
         </button>
       </div>
-
-      {isMenuOpen && (
-        <>
-          <div
-            className="fixed inset-0 z-10"
-            onClick={() => setIsMenuOpen(false)}
-          />
-          <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-20">
-            <Link
-              href="/personal"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Profile
-            </Link>
-            <Link
-              href="/transactions"
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Transactions
-            </Link>
-            <button
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 disabled:opacity-50"
-            >
-              {isLoggingOut ? "Logging out..." : "Log out"}
-            </button>
-          </div>
-        </>
-      )}
-    </div>
+      <SideMenu isOpen={isSideMenuOpen} onClose={() => setIsSideMenuOpen(false)} />
+    </>
   );
 }

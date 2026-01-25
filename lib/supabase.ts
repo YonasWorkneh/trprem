@@ -29,97 +29,130 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
 export interface Database {
   public: {
     Tables: {
-      profiles: {
+      users: {
         Row: {
           id: string;
-          email: string | null;
+          email: string;
+          name: string | null;
+          avatar_url: string | null;
           phone: string | null;
-          full_name: string | null;
-          is_verified: boolean;
+          kyc_status: "not_started" | "pending" | "verified" | "rejected";
+          role: "user" | "admin";
+          trading_balance: number;
+          preferences: Record<string, unknown>;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id: string;
-          email?: string | null;
+          email: string;
+          name?: string | null;
+          avatar_url?: string | null;
           phone?: string | null;
-          full_name?: string | null;
-          is_verified?: boolean;
+          kyc_status?: "not_started" | "pending" | "verified" | "rejected";
+          role?: "user" | "admin";
+          trading_balance?: number;
+          preferences?: Record<string, unknown>;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
-          email?: string | null;
+          email?: string;
+          name?: string | null;
+          avatar_url?: string | null;
           phone?: string | null;
-          full_name?: string | null;
-          is_verified?: boolean;
+          kyc_status?: "not_started" | "pending" | "verified" | "rejected";
+          role?: "user" | "admin";
+          trading_balance?: number;
+          preferences?: Record<string, unknown>;
           created_at?: string;
+          updated_at?: string;
+        };
+      };
+      usdt_wallets: {
+        Row: {
+          id: string;
+          user_id: string;
+          address: string;
+          network: string;
+          balance: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          address: string;
+          network?: string;
+          balance?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          address?: string;
+          network?: string;
+          balance?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
         };
       };
       trades: {
         Row: {
           id: string;
           user_id: string;
-          base_coin_id: string;
-          quote_coin_id: string;
-          side: "buy" | "sell";
-          price: number;
+          asset: string;
           quantity: number;
-          fee: number;
-          created_at: string;
+          price: number;
+          type: "buy" | "sell";
+          is_demo: boolean;
+          timestamp: string;
+          exit_price: number | null;
+          payout: number | null;
+          profit: number | null;
+          status: "open" | "win" | "loss" | "tie" | null;
+          open_time: string | null;
+          close_time: string | null;
+          contract_data: Record<string, unknown> | null;
         };
         Insert: {
           id?: string;
           user_id: string;
-          base_coin_id: string;
-          quote_coin_id: string;
-          side: "buy" | "sell";
-          price: number;
+          asset: string;
           quantity: number;
-          fee?: number;
-          created_at?: string;
+          price: number;
+          type: "buy" | "sell";
+          is_demo?: boolean;
+          timestamp?: string;
+          exit_price?: number | null;
+          payout?: number | null;
+          profit?: number | null;
+          status?: "open" | "win" | "loss" | "tie" | null;
+          open_time?: string | null;
+          close_time?: string | null;
+          contract_data?: Record<string, unknown> | null;
         };
         Update: {
           id?: string;
           user_id?: string;
-          base_coin_id?: string;
-          quote_coin_id?: string;
-          side?: "buy" | "sell";
-          price?: number;
+          asset?: string;
           quantity?: number;
-          fee?: number;
-          created_at?: string;
-        };
-      };
-      transactions: {
-        Row: {
-          id: string;
-          user_id: string;
-          coin_id: string;
-          type: "deposit" | "withdraw";
-          amount: number;
-          tx_hash: string | null;
-          status: string;
-          created_at: string;
-        };
-        Insert: {
-          id?: string;
-          user_id: string;
-          coin_id: string;
-          type: "deposit" | "withdraw";
-          amount: number;
-          tx_hash?: string | null;
-          status?: string;
-          created_at?: string;
-        };
-        Update: {
-          id?: string;
-          user_id?: string;
-          coin_id?: string;
-          type?: "deposit" | "withdraw";
-          amount?: number;
-          tx_hash?: string | null;
-          status?: string;
-          created_at?: string;
+          price?: number;
+          type?: "buy" | "sell";
+          is_demo?: boolean;
+          timestamp?: string;
+          exit_price?: number | null;
+          payout?: number | null;
+          profit?: number | null;
+          status?: "open" | "win" | "loss" | "tie" | null;
+          open_time?: string | null;
+          close_time?: string | null;
+          contract_data?: Record<string, unknown> | null;
         };
       };
     };

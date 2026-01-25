@@ -253,7 +253,15 @@ export default function PersonalPage() {
               title="KYC Verification"
               description="Identity verification status"
               href="/personal/kyc"
-              badge={profile?.is_verified ? "Verified" : "Unverified"}
+              badge={
+                profile?.kyc_status === "verified"
+                  ? "Verified"
+                  : profile?.kyc_status === "pending"
+                    ? "Pending"
+                    : profile?.kyc_status === "rejected"
+                      ? "Rejected"
+                      : "Not Started"
+              }
             />
           </ProfileSection>
 

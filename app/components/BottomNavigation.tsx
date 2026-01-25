@@ -99,11 +99,6 @@ export default function BottomNavigation() {
             );
           })}
         </div>
-        {isAuthenticated && displayEmail && (
-          <div className="px-4 pb-2 text-center">
-            <span className="text-xs text-gray-600">{displayEmail}</span>
-          </div>
-        )}
       </div>
     </nav>
   );
