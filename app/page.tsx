@@ -30,7 +30,9 @@ export default function Page() {
       };
       loadBalance();
     } else {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 0);
     }
   }, [isAuthenticated, user]);
 

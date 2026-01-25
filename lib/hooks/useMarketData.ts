@@ -30,7 +30,11 @@ export function useMarketData(filter: MarketFilter): UseMarketDataResult {
   };
 
   useEffect(() => {
-    loadData();
+    // Use setTimeout to defer synchronous setState calls
+    const timeoutId = setTimeout(() => {
+      void loadData();
+    }, 0);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const filteredData = filterMarketData(allData, filter);
