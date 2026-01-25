@@ -119,7 +119,7 @@ export async function registerWithEmail(
           name: credentials.fullName,
           phone: credentials.phone || null,
         },
-        emailRedirectTo:"https://trprem.vercel.app/"
+        emailRedirectTo:"https://trprem.vercel.app"
       },
     });
 
