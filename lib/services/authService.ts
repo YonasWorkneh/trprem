@@ -119,6 +119,7 @@ export async function registerWithEmail(
           name: credentials.fullName,
           phone: credentials.phone || null,
         },
+        emailRedirectTo:"https://trprem.vercel.app/"
       },
     });
 
@@ -143,7 +144,9 @@ export async function registerWithEmail(
           id: data.user.id,
           email: data.user.email || undefined,
         },
+        
       },
+
     };
   } catch (error) {
     return {

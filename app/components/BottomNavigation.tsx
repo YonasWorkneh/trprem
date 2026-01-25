@@ -81,7 +81,7 @@ export default function BottomNavigation() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white/50 backdrop-blur-lg border-t border-gray-200/50 rounded-t-3xl shadow-lg">
       <div className="mx-auto px-4">
-        <div className="flex justify-around items-center py-2">
+        <div className="flex justify-around items-center">
           {navItems.map((item) => {
             const isActive = activeItem === item.id;
             const href = item.requiresAuth && !isAuthenticated ? "/login" : item.href;
@@ -89,7 +89,7 @@ export default function BottomNavigation() {
               <Link
                 key={item.id}
                 href={href}
-                className={`flex flex-col items-center gap-1 cursor-pointer px-6 hover:bg-gray-100/50! p-2 rounded-lg transition-colors ${
+                className={`flex flex-col items-center gap-1 cursor-pointer px-6 hover:bg-gray-100/50! p-4 rounded-lg transition-colors ${
                   isActive ? "text-blue-600" : "text-gray-600"
                 }`}
               >
