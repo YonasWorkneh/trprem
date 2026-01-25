@@ -17,7 +17,7 @@ export default function ChartControls({ onTimeframeChange }: ChartControlsProps)
   useEffect(() => {
     // Convert timeframe to TradingView format
     // "1m" -> "1", "15m" -> "15", "30m" -> "30", "1h" -> "60"
-    let interval = activeTimeframe;
+    let interval: string;
     if (activeTimeframe === "1h") {
       interval = "60";
     } else {

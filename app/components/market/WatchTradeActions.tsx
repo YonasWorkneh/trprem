@@ -26,13 +26,13 @@ export default function WatchTradeActions({ coinId }: WatchTradeActionsProps) {
       <div className="max-w-7xl mx-auto flex gap-3">
         <button
           onClick={handleWatch}
-          className="flex-1 bg-white border-2 border-gray-300 text-gray-900 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+          className="flex-1 bg-white border-2 border-gray-300 cursor-pointer text-gray-900 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
         >
           <span>Watch</span>
         </button>
         <button
           onClick={handleTrade}
-          className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
+          className="flex-1 bg-blue-600 cursor-pointer text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors"
         >
           Trade
         </button>

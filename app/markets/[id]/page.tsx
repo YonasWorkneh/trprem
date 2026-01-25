@@ -1,12 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Header from "@/app/components/Header";
 import BottomNavigation from "@/app/components/BottomNavigation";
 import CoinDetailHeader from "@/app/components/market/CoinDetailHeader";
-import ChartControls from "@/app/components/market/ChartControls";
-import OHLCData from "@/app/components/market/OHLCData";
 import AboutSection from "@/app/components/market/AboutSection";
 import WatchTradeActions from "@/app/components/market/WatchTradeActions";
 import TradingViewChart from "@/app/components/market/TradingViewChart";
@@ -15,6 +13,7 @@ import type { MarketData } from "@/lib/types/market";
 
 export default function MarketDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const coinId = params.id as string;
   const [coin, setCoin] = useState<MarketData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -52,8 +51,50 @@ export default function MarketDetailPage() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header title="trade prememium" />
         <main className="flex-1 pb-20 px-4 flex items-center justify-center">
-          <div className="text-center">
-            <p className="text-gray-500 mb-4">Coin not found</p>
+          <div className="max-w-md mx-auto text-center">
+            <div className="mb-6">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
+                <svg
+                  width="40"
+                  height="40"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-gray-400"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Coin Not Found
+            </h2>
+            <p className="text-gray-600 mb-6">
+              The coin you&apos;re looking for doesn&apos;t exist or is no longer available.
+            </p>
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+              Go Back
+            </button>
           </div>
         </main>
         <BottomNavigation />
