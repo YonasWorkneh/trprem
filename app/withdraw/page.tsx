@@ -138,7 +138,7 @@ export default function WithdrawPage() {
                       })}
                     </div>
                     <div className="flex items-center gap-1 text-white/70 bg-white/10 rounded-full px-2 py-1 w-fit text-[10px]">
-                      <Info className="w-4 h-4" />
+                      <Info className="w-3 h-3 mr-1" />
                       <span>Daily withdrawal limit applies</span>
                     </div>
                   </div>
