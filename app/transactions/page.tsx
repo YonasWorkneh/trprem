@@ -8,7 +8,11 @@ import BottomNavigation from "@/app/components/BottomNavigation";
 import TradingTypeTabs from "@/app/components/transactions/TradingTypeTabs";
 import OrderTabs from "@/app/components/transactions/OrderTabs";
 import BalanceSummaryCard from "@/app/components/transactions/BalanceSummaryCard";
+import SpotBalanceCard from "@/app/components/transactions/SpotBalanceCard";
 import ProfitCard from "@/app/components/transactions/ProfitCard";
+import ContractTradeModal from "@/app/components/transactions/ContractTradeModal";
+import SpotExchangeModal from "@/app/components/transactions/SpotExchangeModal";
+import LoadingState from "@/app/components/market/LoadingState";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/types/auth";
 
@@ -21,6 +25,9 @@ export default function TransactionsPage() {
   const [todayProfit, setTodayProfit] = useState(0);
   const [totalProfit, setTotalProfit] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
+  const [isSpotModalOpen, setIsSpotModalOpen] = useState(false);
+  const [isLoadingSpotData, setIsLoadingSpotData] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -53,8 +60,11 @@ export default function TransactionsPage() {
   };
 
   const handleStartContractTrade = () => {
-    // TODO: Navigate to contract trading page
-    toast.info("Contract trading feature coming soon");
+    if (activeTradingType === "spot") {
+      setIsSpotModalOpen(true);
+    } else {
+      setIsContractModalOpen(true);
+    }
   };
 
   if (authLoading) {
@@ -96,46 +106,99 @@ export default function TransactionsPage() {
             />
           </div>
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-3 mb-4">
-            <BalanceSummaryCard
-              totalBalance={totalBalance}
-              onRefresh={handleRefresh}
-              isRefreshing={isRefreshing}
-            />
-            <ProfitCard title="Today's Profit" value={todayProfit} />
-            <ProfitCard title="Total Profit" value={totalProfit} />
-          </div>
+          {activeTradingType === "spot" ? (
+            <>
+              {/* Spot Layout */}
+              <SpotBalanceCard
+                totalBalance={totalBalance}
+                onRefresh={handleRefresh}
+                isRefreshing={isRefreshing}
+              />
 
-          {/* Start Contract Trade Button */}
-          <button
-            onClick={handleStartContractTrade}
-            className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors mb-6"
-          >
-            Start Contract Trade
-          </button>
+              {/* Start Spot Trading Button */}
+              <button
+                onClick={handleStartContractTrade}
+                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors mb-6"
+              >
+                Start Spot Trading
+              </button>
 
-          {/* Order Tabs */}
-          <OrderTabs
-            activeTab={activeOrderTab}
-            onTabChange={setActiveOrderTab}
-          />
+              {/* Order Tabs */}
+              <OrderTabs
+                activeTab={activeOrderTab}
+                onTabChange={setActiveOrderTab}
+              />
 
-          {/* Content Area */}
-          <div className="bg-white rounded-xl border border-gray-200 p-4 min-h-[200px]">
-            {activeOrderTab === "positions" ? (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-600">No open positions</p>
+              {/* Content Area */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 min-h-[200px]">
+                {isLoadingSpotData ? (
+                  <LoadingState />
+                ) : activeOrderTab === "positions" ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No current positions</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No order history</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-sm text-gray-600">No historical orders</p>
+            </>
+          ) : (
+            <>
+              {/* Contract/Option Layout */}
+              {/* Summary Cards */}
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <BalanceSummaryCard
+                  totalBalance={totalBalance}
+                  onRefresh={handleRefresh}
+                  isRefreshing={isRefreshing}
+                />
+                <ProfitCard title="Today's Profit" value={todayProfit} />
+                <ProfitCard title="Total Profit" value={totalProfit} />
               </div>
-            )}
-          </div>
+
+              {/* Start Contract Trade Button */}
+              <button
+                onClick={handleStartContractTrade}
+                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors mb-6"
+              >
+                Start Contract Trade
+              </button>
+
+              {/* Order Tabs */}
+              <OrderTabs
+                activeTab={activeOrderTab}
+                onTabChange={setActiveOrderTab}
+              />
+
+              {/* Content Area */}
+              <div className="bg-white rounded-xl border border-gray-200 p-4 min-h-[200px]">
+                {activeOrderTab === "positions" ? (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No open positions</p>
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-sm text-gray-600">No historical orders</p>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </main>
       <BottomNavigation />
+      <ContractTradeModal
+        isOpen={isContractModalOpen}
+        onClose={() => setIsContractModalOpen(false)}
+        availableBalance={totalBalance}
+      />
+      <SpotExchangeModal
+        isOpen={isSpotModalOpen}
+        onClose={() => setIsSpotModalOpen(false)}
+        availableBalance={totalBalance}
+      />
     </div>
   );
 }
