@@ -51,3 +51,8 @@ export interface MarketData {
 }
 
 export type MarketFilter = "hot" | "24h-list" | "rise" | "loss";
+
+export interface FetchMarketDataResult {
+  data: MarketData[];
+  error: Error | null;
+}

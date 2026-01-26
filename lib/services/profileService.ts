@@ -2,20 +2,7 @@
 
 import { supabase } from "../supabase";
 import type { Profile } from "../types/auth";
-
-export interface WalletBalance {
-  totalBalance: number;
-  assetsValue: number;
-}
-
-export interface ProfileDataResult {
-  success: boolean;
-  data?: {
-    profile: Profile;
-    balance: WalletBalance;
-  };
-  error?: string;
-}
+import type { WalletBalance, ProfileDataResult } from "../types/profile";
 
 export async function getProfileData(
   userId: string

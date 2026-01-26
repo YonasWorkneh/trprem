@@ -1,11 +1,10 @@
-import type { CoinGeckoMarketData, MarketData } from "../types/market";
+import type {
+  CoinGeckoMarketData,
+  MarketData,
+  FetchMarketDataResult,
+} from "../types/market";
 
 const COINGECKO_API_BASE = "https://api.coingecko.com/api/v3";
-
-export interface FetchMarketDataResult {
-  data: MarketData[];
-  error: Error | null;
-}
 
 export async function fetchMarketData(): Promise<FetchMarketDataResult> {
   try {

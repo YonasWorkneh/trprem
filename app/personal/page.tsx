@@ -14,7 +14,7 @@ import ProfileItem from "@/app/components/profile/ProfileItem";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
 import { logout } from "@/lib/services/authService";
-import type { WalletBalance } from "@/lib/services/profileService";
+import type { WalletBalance } from "@/lib/types/profile";
 
 function PersonIcon() {
   return (
