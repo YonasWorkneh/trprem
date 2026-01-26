@@ -104,7 +104,7 @@ export default function BalanceCard({
       <div className="flex gap-3">
         <Link
           href="/deposit"
-          className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          className="flex-1 bg-[#F4D03F] text-yellow-900 py-3 rounded-lg font-medium hover:bg-[#F1C40F] transition-colors flex items-center justify-center gap-2"
         >
           <svg
             width="18"
@@ -123,7 +123,7 @@ export default function BalanceCard({
         </Link>
         <Link
           href="/withdraw"
-          className="flex-1 bg-white border-2 border-gray-300 text-gray-900 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+          className="flex-1 bg-white border border-gray-300 text-gray-900 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
         >
           <svg
             width="18"

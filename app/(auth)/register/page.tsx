@@ -76,7 +76,7 @@ export default function RegisterPage() {
       <AuthLayout showFooter={false} showLogo={false}>
         <div className="w-full max-w-md mx-auto">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-[rgba(244,208,63,0.1)] rounded-full mb-4">
               <svg
                 width="32"
                 height="32"
@@ -86,7 +86,7 @@ export default function RegisterPage() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-blue-600"
+                className="text-[#F4D03F]"
               >
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
                 <polyline points="22,6 12,13 2,6" />
@@ -125,7 +125,7 @@ export default function RegisterPage() {
               ].map((item) => (
                 <div key={item.step} className="flex items-start gap-3">
                   <div className="shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                    <span className="text-blue-600 text-xs font-bold">
+                    <span className="text-[#F4D03F] text-xs font-bold">
                       {item.step}
                     </span>
                   </div>
@@ -155,7 +155,7 @@ export default function RegisterPage() {
 
             <Link
               href="/login"
-              className="block w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors text-center"
+              className="block w-full bg-[#F4D03F] text-yellow-900 py-3 rounded-lg font-medium hover:bg-[#F1C40F] transition-colors text-center"
             >
               Go to Sign In
             </Link>
@@ -169,8 +169,8 @@ export default function RegisterPage() {
             </Link>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-            <p className="text-xs text-blue-800">
+          <div className="mt-6 p-4 bg-[rgba(244,208,63,0.1)] rounded-lg border border-[rgba(244,208,63,0.2)]">
+            <p className="text-xs text-[#F1C40F]">
               <strong>
                 Didn&apos;t receive the{" "}
                 {registerMethod === "email" ? "email" : "message"}?
@@ -267,11 +267,11 @@ export default function RegisterPage() {
                 type="checkbox"
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#F4D03F] border-gray-300 rounded focus:ring-[#F4D03F] focus:ring-2"
               />
               <span className="text-sm text-gray-700">
                 I have read and agree to the{" "}
-                <Link href="/user-agreement" className="text-blue-600 hover:underline">
+                <Link href="/user-agreement" className="text-[#F4D03F] hover:underline">
                   User Agreement
                 </Link>
               </span>
@@ -281,14 +281,14 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading || !agreedToTerms}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-normal hover:bg-blue-700 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#F4D03F] text-yellow-900 py-3 rounded-lg font-normal hover:bg-[#F1C40F] mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Creating account..." : "Create account"}
           </button>
 
           <p className="text-sm text-center text-gray-600">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-[#F4D03F] hover:underline">
               Sign in
             </Link>
           </p>

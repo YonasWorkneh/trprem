@@ -91,16 +91,16 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-normal hover:bg-blue-700 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#F4D03F] text-yellow-900 py-3 rounded-lg font-normal hover:bg-[#F1C40F] mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
 
           <div className="flex justify-between text-sm">
-            <Link href="/register" className="text-blue-600 hover:underline">
+            <Link href="/register" className="text-[#F4D03F] hover:underline">
               Create account
             </Link>
-            <Link href="/forgot-password" className="text-blue-600 hover:underline">
+            <Link href="/forgot-password" className="text-[#F4D03F] hover:underline">
               Forgot password?
             </Link>
           </div>

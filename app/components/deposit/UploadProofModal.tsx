@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 import { X, Upload as UploadIcon } from "lucide-react";
 
@@ -8,16 +8,47 @@ interface UploadProofModalProps {
   isOpen: boolean;
   onClose: () => void;
   onUploadComplete: (file: File) => void;
+  initialFile?: File | null;
 }
 
 export default function UploadProofModal({
   isOpen,
   onClose,
   onUploadComplete,
+  initialFile = null,
 }: UploadProofModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Initialize with initialFile when modal opens
+  useEffect(() => {
+    if (isOpen && initialFile) {
+      setSelectedFile(initialFile);
+      const url = URL.createObjectURL(initialFile);
+      setPreviewUrl(url);
+    } else if (!isOpen) {
+      // Clean up when modal closes
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+      setSelectedFile(null);
+      setPreviewUrl(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, initialFile]);
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
 
   if (!isOpen) return null;
 
@@ -34,6 +65,11 @@ export default function UploadProofModal({
       if (!file.type.match(/^image\/(jpeg|jpg|png)$/)) {
         toast.error("File must be JPG or PNG format");
         return;
+      }
+
+      // Clean up previous preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
       }
 
       setSelectedFile(file);
@@ -136,7 +172,7 @@ export default function UploadProofModal({
             {/* Preview */}
             {previewUrl && (
               <div className="mb-6">
-                <div className="bg-gray-50 rounded-xl p-4 border-2 border-gray-200">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
                   <div className="relative w-full aspect-square max-h-64 flex items-center justify-center overflow-hidden rounded-lg">
                     <img
                       src={previewUrl}
@@ -152,14 +188,14 @@ export default function UploadProofModal({
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex-1 bg-white border-2 border-gray-300 text-gray-900 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex-1 bg-white border border-gray-300 text-gray-900 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSelectProof}
                 disabled={!selectedFile}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                className="flex-1 bg-[#F4D03F] text-yellow-900 py-3 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 <UploadIcon className="w-4 h-4" />
                 <span>Select Proof</span>

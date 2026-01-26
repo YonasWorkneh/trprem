@@ -4,7 +4,7 @@ export default function HeroSection() {
       <div className="max-w-7xl mx-auto text-center">
         <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
           Trade crypto,{" "}
-          <span className="text-blue-600">securely.</span>
+          <span className="text-[#F4D03F]">securely.</span>
         </h2>
         <p className="text-base text-gray-700 mt-2">
           Buy, sell, and store hundreds of cryptocurrencies.

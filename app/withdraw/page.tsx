@@ -78,7 +78,7 @@ export default function WithdrawPage() {
             <p className="text-gray-500 mb-4">Please log in to withdraw funds</p>
             <Link
               href="/login"
-              className="text-blue-600 hover:underline"
+              className="text-[#F4D03F] hover:underline"
             >
               Go to Login
             </Link>
@@ -97,7 +97,7 @@ export default function WithdrawPage() {
       <Header title="trade prememium" />
       <main className="flex-1 pb-20">
         <div className="px-4 pt-6">
-          <div className="max-w-xl mx-auto">
+          <div className="max-w-2xl mx-auto">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -123,22 +123,22 @@ export default function WithdrawPage() {
             </div>
 
             {/* Available Balance Banner */}
-            <div className="bg-blue-600 rounded-2xl p-6 mb-6 relative overflow-hidden">
+            <div className="bg-[#F4D03F] rounded-2xl p-6 mb-6 relative overflow-hidden">
               <div className="relative z-10">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Wallet className="w-5 h-5 text-white" />
-                      <span className="text-white/90 text-sm">Available Balance</span>
+                      <Wallet className="w-5 h-5 text-yellow-900" />
+                      <span className="text-yellow-900/90 text-sm">Available Balance</span>
                     </div>
-                    <div className="text-4xl font-bold text-white mb-2">
+                    <div className="text-4xl font-bold text-yellow-900 mb-2">
                       ${balance.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </div>
-                    <div className="flex items-center gap-1 text-white/70 bg-white/10 rounded-full px-2 py-1 w-fit text-[10px]">
-                      <Info className="w-3 h-3 mr-1" />
+                    <div className="flex items-center gap-1 text-yellow-900/70 text-xs">
+                      <Info className="w-4 h-4" />
                       <span>Daily withdrawal limit applies</span>
                     </div>
                   </div>
@@ -152,20 +152,20 @@ export default function WithdrawPage() {
             {/* Withdrawal Form */}
             <div className="space-y-6">
               {/* Withdrawal Amount */}
-              <div className="rounded-2xl border border-gray-200 p-6">
+              <div>
                 <div className="flex items-center justify-between mb-2">
                   <label className="text-sm font-medium text-gray-700">
                     Withdrawal Amount
                   </label>
-                  <span className="text-xs text-gray-500 border border-gray-300 rounded-full px-2 py-1 w-fit text-[10px]">Min: {minWithdrawal} USDT</span>
+                  <span className="text-xs text-gray-500">Min: {minWithdrawal} USDT</span>
                 </div>
-                <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
                   <div className="flex-1 relative">
                     <input
                       type="number"
                       value={withdrawalAmount}
                       onChange={(e) => setWithdrawalAmount(e.target.value)}
-                      className="w-full text-2xl font-bold text-gray-900 py-3 px-4 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-gray-300"
+                      className="w-full text-2xl font-bold text-gray-900 py-3 px-4 border border-gray-300 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F4D03F] focus:border-[#F4D03F]"
                       placeholder="0.00"
                       min={minWithdrawal}
                       step="0.01"
@@ -175,7 +175,7 @@ export default function WithdrawPage() {
                     <select
                       value={selectedNetwork}
                       onChange={(e) => setSelectedNetwork(e.target.value)}
-                      className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-900 focus:outline-none focus:ring-0 focus:border-gray-300 cursor-pointer"
+                      className="appearance-none bg-white border border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#F4D03F] focus:border-[#F4D03F] cursor-pointer"
                     >
                       <option value="USDT-TRC20">USDT-TRC20</option>
                       <option value="USDT-ERC20">USDT-ERC20</option>
@@ -200,7 +200,7 @@ export default function WithdrawPage() {
               </div>
 
               {/* Wallet Address */}
-              <div className="rounded-2xl border border-gray-200 p-6">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Wallet Address
                 </label>
@@ -208,7 +208,7 @@ export default function WithdrawPage() {
                   type="text"
                   value={walletAddress}
                   onChange={(e) => setWalletAddress(e.target.value)}
-                  className="w-full py-3 px-4 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-gray-300"
+                  className="w-full py-3 px-4 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F4D03F] focus:border-[#F4D03F]"
                   placeholder="Enter your USDT address"
                 />
                 <div className="flex items-center gap-1 mt-2 text-xs text-gray-500">
@@ -234,7 +234,7 @@ export default function WithdrawPage() {
               </div>
 
               {/* Security */}
-              <div className="rounded-2xl border border-gray-200 p-6">
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Security
                 </label>
@@ -244,12 +244,12 @@ export default function WithdrawPage() {
                     type="password"
                     value={withdrawalPassword}
                     onChange={(e) => setWithdrawalPassword(e.target.value)}
-                    className="w-full py-3 pl-12 pr-24 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus:border-gray-300"
+                    className="w-full py-3 pl-12 pr-24 border border-gray-300 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#F4D03F] focus:border-[#F4D03F]"
                     placeholder="Enter withdrawal password"
                   />
                   <Link
                     href="/personal/security"
-                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-blue-600 hover:underline"
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-sm text-[#F4D03F] hover:underline"
                   >
                     Set Password
                   </Link>
@@ -283,7 +283,7 @@ export default function WithdrawPage() {
               <button
                 onClick={handleWithdraw}
                 disabled={showKycWarning || calculatedReceive < 0 || !walletAddress || !withdrawalPassword}
-                className="w-full bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Withdraw Funds</span>
                 <svg

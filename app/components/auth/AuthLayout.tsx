@@ -24,10 +24,10 @@ export default function AuthLayout({ children, isLogin = false, showFooter = tru
         {children}
         {showFooter && <p className="text-sm text-gray-500 mt-8 text-center">
           By {isLogin ? "signing in" : "creating an account"}, you agree to our{" "}
-          <Link href="/terms" className="text-blue-600 hover:underline">
+          <Link href="/terms" className="text-[#F4D03F] hover:underline">
             Terms of Service
           </Link>{" "}
-          and{" "}<Link href="/privacy" className="text-blue-600 hover:underline">
+          and{" "}<Link href="/privacy" className="text-[#F4D03F] hover:underline">
             Privacy Policy
           </Link>
         </p>}

@@ -54,8 +54,8 @@ export default function SupportPage() {
             {/* Live Chat & Tickets Card */}
             <div className="bg-[#EFF6FF] rounded-2xl p-6 shadow-sm border border-gray-200">
               <div className="mb-6">
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                  <MessageCircle className="w-8 h-8 text-blue-600" strokeWidth={1.5} />
+                <div className="w-16 h-16 rounded-full bg-[rgba(244,208,63,0.1)] flex items-center justify-center mb-4">
+                  <MessageCircle className="w-8 h-8 text-[#F4D03F]" strokeWidth={1.5} />
                 </div>
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
                   Live Chat & Tickets
@@ -72,7 +72,7 @@ export default function SupportPage() {
 
           {/* FAQ Section */}
           <div className="text-center bg-gray-100/50 rounded-xl p-4">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-dashed border-gray-300 mb-4">
+            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full border border-dashed border-gray-300 mb-4">
               <HelpCircle className="w-6 h-6 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">

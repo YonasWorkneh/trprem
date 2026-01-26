@@ -18,7 +18,7 @@ export default function LoginMethodSelector({
         onClick={() => onMethodChange("email")}
         className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors ${
           selectedMethod === "email"
-            ? "text-gray-900 border-blue-600 bg-white"
+            ? "bg-[rgba(244,208,63,0.16)] border-[#F4D03F] text-yellow-900"
             : "text-gray-600 border-transparent hover:text-gray-900"
         }`}
       >
@@ -29,7 +29,7 @@ export default function LoginMethodSelector({
         onClick={() => onMethodChange("mobile")}
         className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors ${
           selectedMethod === "mobile"
-            ? "text-gray-900 border-blue-600 bg-white"
+            ? "bg-[rgba(244,208,63,0.16)] border-[#F4D03F] text-yellow-900"
             : "text-gray-600 border-transparent hover:text-gray-900"
         }`}
       >

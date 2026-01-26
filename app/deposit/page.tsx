@@ -2,13 +2,24 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { toast } from "sonner";
 import Header from "@/app/components/Header";
 import BottomNavigation from "@/app/components/BottomNavigation";
-import { ArrowLeft, Copy, Upload, Check, CircleCheck } from "lucide-react";
+import { ArrowLeft, Copy, Upload, CircleCheck } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
 import UploadProofModal from "@/app/components/deposit/UploadProofModal";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import ethLogo from "@/app/assets/images/eth-logo.png";
+import btcLogo from "@/app/assets/images/btc-logo.png";
+import usdtLogo from "@/app/assets/images/usdt-logo.png";
 
 function formatCryptoAddress(address: string): string {
   if (!address || address.length <= 10) return address;
@@ -219,6 +230,18 @@ export default function DepositPage() {
     USDT: 10,
   };
 
+  const coinLogos: Record<string, typeof ethLogo> = {
+    ETH: ethLogo,
+    BTC: btcLogo,
+    USDT: usdtLogo,
+  };
+
+  const coinNames: Record<string, string> = {
+    ETH: "Ethereum (ETH)",
+    BTC: "Bitcoin (BTC)",
+    USDT: "Tether (USDT)",
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header title="trade prememium" />
@@ -239,7 +262,7 @@ export default function DepositPage() {
 
             <div className="space-y-6">
               {/* Enter Amount Card */}
-              <div className="bg-white rounded-2xl border border-gray-200 p-6">
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <label className="text-sm font-medium text-gray-700">
                     Enter Amount
@@ -248,61 +271,87 @@ export default function DepositPage() {
                     Min: {minDeposit[selectedCurrency] || 0.01} {selectedCurrency}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="grid grid-cols-2 gap-2 items-center bg-gray-100/50 rounded-xl p-4">
                   <input
                     type="number"
                     value={depositAmount}
                     onChange={(e) => setDepositAmount(e.target.value)}
-                    className="flex-1 text-2xl font-bold text-gray-900 py-3 px-4 border-2 border-gray-300 rounded-xl placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="text-2xl font-bold text-gray-900 py-3 px-4 placeholder:text-gray-400 focus:outline-none focus:ring-0 focus-visible:ring-0 bg-transparent"
                     placeholder="0.00"
                     min={minDeposit[selectedCurrency] || 0.01}
                     step="0.01"
                   />
-                  <div className="relative">
-                    <select
-                      value={selectedCurrency}
-                      onChange={(e) => setSelectedCurrency(e.target.value)}
-                      className="appearance-none bg-white border-2 border-gray-300 rounded-xl px-4 py-3 pr-10 text-sm font-medium text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
-                    >
-                      <option value="ETH">Ethereum (ETH)</option>
-                      <option value="BTC">Bitcoin (BTC)</option>
-                      <option value="USDT">Tether (USDT)</option>
-                    </select>
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-400"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+                  <Select
+                    value={selectedCurrency}
+                    onValueChange={(value) => setSelectedCurrency(value)}
+                  >
+                    <SelectTrigger className="bg-transparent border-0 shadow-none focus:ring-0 focus-visible:ring-0 h-auto py-3 px-4 text-sm font-medium text-gray-900 data-[placeholder]:text-gray-900 [&_svg]:text-gray-900">
+                      <SelectValue className="text-gray-900 font-medium">
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={coinLogos[selectedCurrency]}
+                            alt={selectedCurrency}
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
+                          />
+                          <span>{coinNames[selectedCurrency]}</span>
+                        </div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      <SelectItem value="ETH" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={ethLogo}
+                            alt="Ethereum"
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
+                          />
+                          <span>Ethereum (ETH)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="BTC" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={btcLogo}
+                            alt="Bitcoin"
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
+                          />
+                          <span>Bitcoin (BTC)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="USDT" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                        <div className="flex items-center gap-2">
+                          <Image
+                            src={usdtLogo}
+                            alt="Tether"
+                            width={20}
+                            height={20}
+                            className="w-5 h-5"
+                          />
+                          <span>Tether (USDT)</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
 
               {/* Estimated USDT Card */}
-              <div className="bg-gray-100/50 rounded-2xl border border-gray-200 p-6 flex justify-between items-center">
+              <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Estimated USDT
                 </label>
-                <div className="flex items-center gap-2">
-                <div className="text-xl font-bold text-gray-900">
+                <div className="text-3xl font-bold text-gray-900">
                   {estimatedUSDT.toLocaleString("en-US", {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
                   USDT
-                </div>
-                <div className="text-[10px] border border-gray-300 rounded-full text-black p-4 py-1">
-                  USDT
-                </div>
                 </div>
               </div>
 
@@ -316,7 +365,7 @@ export default function DepositPage() {
                 </p>
 
                 {/* QR Code */}
-                <div className=" rounded-xl p-8 mb-4 flex items-center justify-center min-h-[200px]">
+                <div className="bg-gray-50 rounded-xl p-8 mb-4 flex items-center justify-center min-h-[200px]">
                   {walletAddress ? (
                     <canvas
                       ref={qrCanvasRef}
@@ -338,14 +387,14 @@ export default function DepositPage() {
                       type="text"
                       value={walletAddress ? formatCryptoAddress(walletAddress) : ""}
                       readOnly
-                      className="flex-1 py-3 px-4 border-2 border-gray-300 rounded-xl text-gray-900 bg-gray-50 font-mono text-sm focus:outline-none"
+                      className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-900 bg-gray-50 font-mono text-sm focus:outline-none"
                     />
                     <button
                       onClick={handleCopyAddress}
                       className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${
                         copied
                           ? "bg-green-600 text-white"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
+                          : "bg-[#F4D03F] text-yellow-900 hover:bg-[#F1C40F]"
                       }`}
                       aria-label="Copy address"
                     >
@@ -389,7 +438,6 @@ export default function DepositPage() {
                   </div>
                   <button
                     onClick={() => {
-                      setUploadedProof(null);
                       setIsUploadModalOpen(true);
                     }}
                     className="text-sm font-medium text-gray-900 hover:text-gray-700 transition-colors cursor-pointer"
@@ -400,7 +448,7 @@ export default function DepositPage() {
               ) : (
                 <button
                   onClick={handleUploadProof}
-                  className="w-full bg-white border-2 border-gray-300 text-gray-900 py-4 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
+                  className="w-full bg-white border border-gray-300 text-gray-900 py-4 rounded-xl font-medium hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-center gap-2"
                 >
                   <Upload className="w-5 h-5" />
                   <span>Upload Payment Proof</span>
@@ -413,7 +461,7 @@ export default function DepositPage() {
                 <button
                   onClick={handleSubmitDeposit}
                   disabled={!uploadedProof}
-                  className="w-full bg-blue-600 text-white py-4 rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Submit Deposit Request
                 </button>
@@ -427,6 +475,7 @@ export default function DepositPage() {
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
         onUploadComplete={handleProofUploadComplete}
+        initialFile={uploadedProof}
       />
     </div>
   );

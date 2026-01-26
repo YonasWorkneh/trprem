@@ -39,7 +39,7 @@ export default function ChartControls({ onTimeframeChange }: ChartControlsProps)
               }}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 activeTimeframe === tf
-                  ? "bg-blue-600 text-white"
+                  ? "bg-[#F4D03F] text-yellow-900"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >

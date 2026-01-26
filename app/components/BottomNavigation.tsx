@@ -23,25 +23,25 @@ const navItems: NavItem[] = [
 
 function HomeIcon({ isActive }: { isActive: boolean }) {
   return (
-    <Home className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-600"}`}/>
+    <Home className={`w-5 h-5 ${isActive ? "text-[#F4D03F]" : "text-gray-600"}`}/>
   );
 }
 
 function MarketsIcon({ isActive }: { isActive: boolean }) {
   return (
-    <ChartLine className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-600"}`}/>
+    <ChartLine className={`w-5 h-5 ${isActive ? "text-[#F4D03F]" : "text-gray-600"}`}/>
   );
 }
 
 function TransactionsIcon({ isActive }: { isActive: boolean }) {
   return (
-    <FileText className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-600"}`}/>
+    <FileText className={`w-5 h-5 ${isActive ? "text-[#F4D03F]" : "text-gray-600"}`}/>
   );
 }
 
 function PersonalIcon({ isActive }: { isActive: boolean }) {
   return (
-    <User className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-600"}`}/>
+    <User className={`w-5 h-5 ${isActive ? "text-[#F4D03F]" : "text-gray-600"}`}/>
   );
 }
 
@@ -90,7 +90,7 @@ export default function BottomNavigation() {
                 key={item.id}
                 href={href}
                 className={`flex flex-col items-center gap-1 cursor-pointer px-6 hover:bg-gray-100/50! p-4 rounded-lg transition-colors ${
-                  isActive ? "text-blue-600" : "text-gray-600"
+                  isActive ? "text-[#F4D03F]" : "text-gray-600"
                 }`}
               >
                 {renderIcon(item.id, isActive)}

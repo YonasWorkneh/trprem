@@ -16,6 +16,8 @@ export default function Header({ title }: HeaderProps) {
     <header className="w-full px-4 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
+          <div className="rounded-full bg-gray-700 p-2">
+
           <Image
             src="/favicon.png"
             alt="Logo"
@@ -23,6 +25,7 @@ export default function Header({ title }: HeaderProps) {
             height={32}
             className="object-contain"
           />
+          </div>
           <h1 className="hidden md:block text-lg text-gray-900 tracking-tight capitalize font-bold">
             {title}
           </h1>
@@ -42,7 +45,7 @@ export default function Header({ title }: HeaderProps) {
               </Link>
               <Link
                 href="/register"
-                className="bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-700 text-sm font-medium"
+                className="bg-[#F4D03F] text-yellow-900 px-4 py-2 rounded-full hover:bg-[#F1C40F] text-sm font-medium"
               >
                 Sign up
               </Link>

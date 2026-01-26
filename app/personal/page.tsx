@@ -209,7 +209,7 @@ export default function PersonalPage() {
             <p className="text-gray-500 mb-4">Please log in to view your profile</p>
             <Link
               href="/login"
-              className="text-blue-600 hover:underline"
+              className="text-[#F4D03F] hover:underline"
             >
               Go to Login
             </Link>

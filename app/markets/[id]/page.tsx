@@ -79,7 +79,7 @@ export default function MarketDetailPage() {
             </p>
             <button
               onClick={() => router.back()}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors cursor-pointer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-[#F4D03F] text-yellow-900 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors cursor-pointer"
             >
               <svg
                 width="16"

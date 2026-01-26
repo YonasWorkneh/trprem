@@ -78,7 +78,7 @@ export default function Page() {
         ) : (
           <>
             <HeroSection />
-            <ContentFilters />
+            <MarketTabs />
           </>
         )}
       </main>

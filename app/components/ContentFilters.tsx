@@ -24,7 +24,7 @@ export default function ContentFilters() {
       <div className="px-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4">
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-normal hover:bg-blue-700">
+            <button className="bg-[#F4D03F] text-yellow-900 px-4 py-2 rounded-full text-sm font-normal hover:bg-[#F1C40F]">
               Crypto
             </button>
           </div>
@@ -35,7 +35,7 @@ export default function ContentFilters() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-2 font-normal text-sm cursor-pointer ${
                   activeTab === tab.id
-                    ? "text-gray-900 border-b-2 border-blue-600"
+                    ? "text-gray-900 border-b-2 border-[#F4D03F]"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >

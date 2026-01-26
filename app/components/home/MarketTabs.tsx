@@ -1,10 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import type { MarketFilter } from "@/lib/types/market";
+import { useState, useEffect } from "react";
+import type { MarketFilter, MarketData } from "@/lib/types/market";
 import MarketDataList from "../market/MarketDataList";
+import MarketDataItem from "../market/MarketDataItem";
+import { fetchGoldData, fetchForexData, fetchNFTData } from "@/lib/services/marketService";
+import LoadingState from "../market/LoadingState";
+import ErrorState from "../market/ErrorState";
+import EmptyState from "../market/EmptyState";
 
-type MarketCategory = "crypto" | "gold" | "forex" | "stock";
+type MarketCategory = "crypto" | "gold" | "forex" | "nft";
 
 interface CategoryTab {
   id: MarketCategory;
@@ -20,7 +25,7 @@ const categories: CategoryTab[] = [
   { id: "crypto", label: "Crypto" },
   { id: "gold", label: "GOLD" },
   { id: "forex", label: "Forex" },
-  { id: "stock", label: "Stock" },
+  { id: "nft", label: "NFT" },
 ];
 
 const cryptoFilters: FilterTab[] = [
@@ -33,6 +38,42 @@ const cryptoFilters: FilterTab[] = [
 export default function MarketTabs() {
   const [activeCategory, setActiveCategory] = useState<MarketCategory>("crypto");
   const [activeFilter, setActiveFilter] = useState<MarketFilter>("hot");
+  const [otherCategoryData, setOtherCategoryData] = useState<MarketData[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    if (activeCategory === "crypto") {
+      setOtherCategoryData([]);
+      return;
+    }
+
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      let result;
+
+      if (activeCategory === "gold") {
+        result = await fetchGoldData();
+      } else if (activeCategory === "forex") {
+        result = await fetchForexData();
+      } else if (activeCategory === "nft") {
+        result = await fetchNFTData();
+      } else {
+        setLoading(false);
+        return;
+      }
+
+      if (result.error) {
+        setError(result.error);
+      } else {
+        setOtherCategoryData(result.data);
+      }
+      setLoading(false);
+    };
+
+    void loadData();
+  }, [activeCategory]);
 
   return (
     <div className="w-full">
@@ -45,7 +86,7 @@ export default function MarketTabs() {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-4 py-2 rounded-full text-sm font-normal transition-colors ${
                   activeCategory === category.id
-                    ? "bg-blue-600 text-white"
+                    ? "bg-[#F4D03F] text-yellow-900"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
               >
@@ -61,7 +102,7 @@ export default function MarketTabs() {
                   onClick={() => setActiveFilter(filter.id)}
                   className={`pb-2 font-normal text-sm cursor-pointer transition-colors ${
                     activeFilter === filter.id
-                      ? "text-gray-900 border-b-2 border-blue-600"
+                      ? "text-gray-900 border-b-2 border-[#F4D03F]"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
@@ -70,19 +111,34 @@ export default function MarketTabs() {
               ))}
             </nav>
           )}
-          {activeCategory !== "crypto" && (
-            <div className="py-8 text-center">
-              <p className="text-gray-500 text-sm">
-                {categories.find((c) => c.id === activeCategory)?.label} market
-                data coming soon
-              </p>
-            </div>
-          )}
         </div>
       </div>
       {activeCategory === "crypto" && (
         <div className="mt-4">
           <MarketDataList filter={activeFilter} />
+        </div>
+      )}
+      {activeCategory !== "crypto" && (
+        <div className="mt-4">
+          {loading ? (
+            <LoadingState />
+          ) : error ? (
+            <ErrorState message={error.message} onRetry={() => {
+              setActiveCategory(activeCategory);
+            }} />
+          ) : otherCategoryData.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="w-full px-4 pb-4">
+              <div className="max-w-7xl mx-auto">
+                <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  {otherCategoryData.map((item) => (
+                    <MarketDataItem key={item.id} data={item} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

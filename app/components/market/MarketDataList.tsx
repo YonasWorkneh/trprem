@@ -1,7 +1,7 @@
 "use client";
 
 import { useMarketData } from "@/lib/hooks/useMarketData";
-import type { MarketFilter } from "@/lib/types/market";
+import type { MarketFilter, MarketData } from "@/lib/types/market";
 import MarketDataItem from "./MarketDataItem";
 import ErrorState from "./ErrorState";
 import LoadingState from "./LoadingState";
@@ -9,16 +9,20 @@ import EmptyState from "./EmptyState";
 
 interface MarketDataListProps {
   filter: MarketFilter;
+  data?: MarketData[];
 }
 
-export default function MarketDataList({ filter }: MarketDataListProps) {
-  const { data, loading, error, refetch } = useMarketData(filter);
+export default function MarketDataList({ filter, data: providedData }: MarketDataListProps) {
+  const { data: hookData, loading, error, refetch } = useMarketData(filter);
+  
+  // Use provided data if available, otherwise use hook data
+  const data = providedData ?? hookData;
 
-  if (loading) {
+  if (providedData === undefined && loading) {
     return <LoadingState />;
   }
 
-  if (error) {
+  if (providedData === undefined && error) {
     return <ErrorState message={error.message} onRetry={refetch} />;
   }
 
