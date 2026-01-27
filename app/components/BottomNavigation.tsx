@@ -23,25 +23,25 @@ const navItems: NavItem[] = [
 
 function HomeIcon({ isActive }: { isActive: boolean }) {
   return (
-    <Home className={`w-5 h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
+    <Home className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
   );
 }
 
 function MarketsIcon({ isActive }: { isActive: boolean }) {
   return (
-    <ChartLine className={`w-5 h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
+    <ChartLine className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
   );
 }
 
 function TransactionsIcon({ isActive }: { isActive: boolean }) {
   return (
-    <FileText className={`w-5 h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
+    <FileText className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
   );
 }
 
 function PersonalIcon({ isActive }: { isActive: boolean }) {
   return (
-    <User className={`w-5 h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
+    <User className={`w-4 h-4 sm:w-5 sm:h-5 ${isActive ? "text-yellow-600" : "text-gray-600"}`}/>
   );
 }
 
@@ -79,8 +79,8 @@ export default function BottomNavigation() {
   const displayEmail = profile?.email || user?.email || user?.phone || "";
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white/50 backdrop-blur-lg border-t border-gray-200/50 rounded-t-3xl shadow-lg">
-      <div className="mx-auto px-4">
+    <nav className="fixed bottom-0 left-0 right-0 bg-white/50 backdrop-blur-lg border-t border-gray-200/50 rounded-t-3xl shadow-lg z-40">
+      <div className="mx-auto px-2 sm:px-4">
         <div className="flex justify-around items-center">
           {navItems.map((item) => {
             const isActive = activeItem === item.id;
@@ -89,12 +89,14 @@ export default function BottomNavigation() {
               <Link
                 key={item.id}
                 href={href}
-                className={`flex flex-col items-center gap-1 cursor-pointer px-6 hover:bg-gray-100/50! p-4 rounded-lg transition-colors ${
+                className={`flex flex-col items-center gap-0.5 sm:gap-1 cursor-pointer px-2 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 rounded-lg transition-colors min-w-0 flex-1 ${
                   isActive ? "text-yellow-600" : "text-gray-600"
-                }`}
+                } hover:bg-gray-100/50`}
               >
                 {renderIcon(item.id, isActive)}
-                <span className="text-xs font-normal">{item.label}</span>
+                <span className="text-[10px] sm:text-xs font-normal truncate w-full text-center">
+                  {item.label}
+                </span>
               </Link>
             );
           })}
