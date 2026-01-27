@@ -501,13 +501,12 @@ export async function fetchNFTById(
 }
 
 // Fetch NFT chart data
+// Note: This endpoint requires Pro API. For free tier, we return null and component shows a message
 export async function fetchNFTChartData(
   nftId: string,
   days: number = 7
 ): Promise<{ data: Array<[number, number]> | null; error: Error | null }> {
   try {
-    // Note: This endpoint requires Pro API, but we'll try the free tier first
-    // If it fails, we'll return null and the component can handle it
     const url = new URL(`${COINGECKO_API_BASE}/nfts/${nftId}/market_chart`);
     url.searchParams.append("days", days.toString());
 
@@ -516,7 +515,13 @@ export async function fetchNFTChartData(
     });
 
     if (!response.ok) {
-      // If Pro API is required, return empty data (component will handle gracefully)
+      // Pro API required - return null (component will show appropriate message)
+      if (response.status === 401 || response.status === 403) {
+        return {
+          data: null,
+          error: new Error("NFT chart data requires CoinGecko Pro API subscription"),
+        };
+      }
       return { data: null, error: null };
     }
 
@@ -524,6 +529,10 @@ export async function fetchNFTChartData(
 
     // Extract floor_price_usd data: [[timestamp, price], ...]
     const floorPriceData: Array<[number, number]> = chartData.floor_price_usd || [];
+
+    if (floorPriceData.length === 0) {
+      return { data: null, error: null };
+    }
 
     return { data: floorPriceData, error: null };
   } catch (error) {

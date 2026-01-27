@@ -78,12 +78,15 @@ export default function NFTChart({ nftId, days = 7 }: NFTChartProps) {
   }
 
   if (error || chartData.length === 0) {
+    const isProAPIError = error?.includes("Pro API");
     return (
       <div className="w-full h-[400px] rounded-lg bg-gray-50 flex items-center justify-center border border-gray-200">
-        <div className="text-center">
-          <div className="text-gray-500 mb-2">Chart data unavailable</div>
+        <div className="text-center px-4">
+          <div className="text-gray-500 mb-2 font-medium">Chart data unavailable</div>
           <div className="text-sm text-gray-400">
-            {error || "Historical data not available for this NFT"}
+            {isProAPIError
+              ? "NFT historical chart data requires CoinGecko Pro API subscription"
+              : error || "Historical data not available for this NFT"}
           </div>
         </div>
       </div>
