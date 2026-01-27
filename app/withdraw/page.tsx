@@ -269,7 +269,7 @@ export default function WithdrawPage() {
                         Please complete your KYC verification to enable withdrawals.
                       </p>
                       <Link
-                        href="/personal/kyc"
+                        href="/person/kyc"
                         className="inline-block border rounded-full border-[rgb(252,211,77)] text-black px-4 py-2 text-xs hover:bg-[rgba(252,211,77,0.3)] transition-colors"
                       >
                         Complete KYC

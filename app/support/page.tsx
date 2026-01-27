@@ -64,7 +64,10 @@ export default function SupportPage() {
                   Start a conversation with our support team or manage your tickets.
                 </p>
               </div>
-              <button className="w-full bg-[#2563EB] text-white py-3 rounded-xl font-medium hover:bg-[#1D4ED8] transition-colors cursor-pointer">
+              <button
+                onClick={() => router.push("/support/tickets")}
+                className="w-full bg-[#2563EB] text-white py-3 rounded-xl font-medium hover:bg-[#1D4ED8] transition-colors cursor-pointer"
+              >
                 Start Chat
               </button>
             </div>

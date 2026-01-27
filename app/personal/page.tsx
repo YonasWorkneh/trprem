@@ -253,7 +253,7 @@ export default function PersonalPage() {
               icon={<FileTextIcon />}
               title="KYC Verification"
               description="Identity verification status"
-              href="/personal/kyc"
+              href="/person/kyc"
               badge={
                 profile?.kyc_status === "verified"
                   ? "Verified"
@@ -271,7 +271,7 @@ export default function PersonalPage() {
               icon={<ClockIcon />}
               title="Transaction History"
               description="View your deposits and withdrawals"
-              href="/transactions"
+              href="/transactions/history"
             />
           </ProfileSection>
 

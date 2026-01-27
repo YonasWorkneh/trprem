@@ -25,7 +25,7 @@ const menuItems: MenuItem[] = [
     id: "assets",
     label: "Assets",
     description: "View your portfolio",
-    href: "/assets",
+    href: "/person/assets",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ color: 'var(--theme-primary)' }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-list w-5 h-5"><path d="M3 12h.01"></path><path d="M3 18h.01"></path><path d="M3 6h.01"></path><path d="M8 12h13"></path><path d="M8 18h13"></path><path d="M8 6h13"></path></svg>
     ),
@@ -52,7 +52,7 @@ const menuItems: MenuItem[] = [
     id: "live-chat",
     label: "Live Chat",
     description: "Customer support",
-    href: "/live-chat",
+    href: "/support",
     icon: (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" style={{ color: 'var(--theme-primary)' }} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-messages-square w-5 h-5"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"></path><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"></path></svg> 
     ),

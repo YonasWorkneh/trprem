@@ -84,7 +84,7 @@ export default function AssetsPage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header title="trade prememium" />
       <main className="flex-1 pb-20">
-        <div className="px-4 max-w-7xl mx-auto">
+        <div className="px-4 max-w-2xl mx-auto">
           {/* Page Header */}
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center gap-3">

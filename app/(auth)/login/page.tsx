@@ -97,10 +97,10 @@ export default function LoginPage() {
           </button>
 
           <div className="flex justify-between text-sm">
-            <Link href="/register" className="text-[#F4D03F] hover:underline">
+            <Link href="/register" className="text-(--color-theme-primary-text) hover:underline">
               Create account
             </Link>
-            <Link href="/forgot-password" className="text-[#F4D03F] hover:underline">
+            <Link href="/forgot-password" className="text-(--color-theme-primary-text) hover:underline">
               Forgot password?
             </Link>
           </div>

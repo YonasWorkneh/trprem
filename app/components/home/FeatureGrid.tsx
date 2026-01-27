@@ -51,7 +51,7 @@ const features: Feature[] = [
     id: "assets",
     label: "Assets",
     icon: <List className="w-6 h-6" />,
-    href: "/assets",
+    href: "/person/assets",
   },
   {
     id: "fast-trade",
@@ -70,10 +70,10 @@ export default function FeatureGrid() {
             <Link
               key={feature.id}
               href={feature.href}
-              className="flex flex-col items-center gap-2 p-4 bg-[var(--theme-primary-bg-10)] rounded-2xl border border-gray-200 hover:bg-[var(--theme-primary-bg-16)] transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-(--theme-primary-bg-10) rounded-2xl border border-gray-200 hover:bg-(--theme-primary-bg-16) transition-colors"
             >
-              <div className="text-[var(--theme-primary-text-lighter)]">{feature.icon}</div>
-              <span className="text-xs text-[var(--theme-primary-text-light)] text-center font-medium">
+              <div className="text-(--theme-primary-text-lighter)">{feature.icon}</div>
+              <span className="text-xs text-(--theme-primary-text-light) text-center font-medium">
                 {feature.label}
               </span>
             </Link>
