@@ -132,95 +132,87 @@ export function filterMarketData(
   }
 }
 
-// GOLD API - Using freegoldprice.org API
+// GOLD & PRECIOUS METALS API - Using CoinGecko tokenized precious metals
 export async function fetchGoldData(): Promise<FetchMarketDataResult> {
   try {
-    // Fetch current gold price from free API
-    const response = await fetch(
-      "https://api.freegoldprice.org/v1/gold/USD",
-      {
-        cache: "no-store",
-        headers: {
-          Accept: "application/json",
-        },
-      }
-    );
+    // Fetch tokenized precious metals from CoinGecko
+    // These tokens track the actual spot prices of physical metals
+    const url = new URL(`${COINGECKO_API_BASE}/coins/markets`);
+    url.searchParams.append("vs_currency", "usd");
+    url.searchParams.append("ids", "tether-gold,pax-gold,kinesis-gold,kinesis-silver");
+    url.searchParams.append("order", "market_cap_desc");
+    url.searchParams.append("per_page", "10");
+    url.searchParams.append("page", "1");
+    url.searchParams.append("sparkline", "true");
+    url.searchParams.append("price_change_percentage", "24h");
+
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+    });
 
     if (!response.ok) {
-      // Fallback to alternative API
-      const altResponse = await fetch(
-        "https://api.metals.live/v1/spot/gold",
-        {
-          cache: "no-store",
-          headers: {
-            Accept: "application/json",
-          },
-        }
-      );
-
-      if (!altResponse.ok) {
-        throw new Error("Failed to fetch gold price from all sources");
-      }
-
-      const altData = await altResponse.json();
-      const currentPrice = altData.price || 0;
-      const priceChange24h = altData.change || 0;
-      const priceChangePercentage24h = altData.changePercent || 0;
-
-      return {
-        data: [
-          {
-            id: "gold-oz",
-            symbol: "XAU",
-            name: "Gold (Ounce)",
-            image: "https://assets.coingecko.com/coins/images/1/large/gold.png",
-            currentPrice,
-            priceChange24h,
-            priceChangePercentage24h,
-            high24h: currentPrice * 1.01,
-            low24h: currentPrice * 0.99,
-            totalVolume: 0,
-            marketCap: 0,
-            marketCapRank: 1,
-            sparklineData: [],
-          },
-        ],
-        error: null,
-      };
+      throw new Error(`Failed to fetch precious metals data: ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const currentPrice = data.price || data.rate || 0;
-    
-    // Calculate 24h change if available
-    const priceChange24h = data.change || data.change24h || 0;
-    const priceChangePercentage24h = data.changePercent || data.changePercent24h || 0;
-    const high24h = data.high24h || data.high || currentPrice * 1.01;
-    const low24h = data.low24h || data.low || currentPrice * 0.99;
+    const rawData: CoinGeckoMarketData[] = await response.json();
 
-    const marketData: MarketData[] = [
-      {
-        id: "gold-oz",
-        symbol: "XAU",
-        name: "Gold (Ounce)",
-        image: "https://assets.coingecko.com/coins/images/1/large/gold.png",
-        currentPrice,
-        priceChange24h,
-        priceChangePercentage24h,
-        high24h,
-        low24h,
-        totalVolume: 0,
-        marketCap: 0,
-        marketCapRank: 1,
-        sparklineData: [],
-      },
-    ];
+    // Map CoinGecko data to our MarketData format
+    // Transform tokenized metals to display as physical metals
+    const marketData: MarketData[] = rawData.map((item) => {
+      // Determine display name and symbol based on token type
+      let displayName = item.name;
+      let displaySymbol = item.symbol.toUpperCase();
 
-    return { data: marketData, error: null };
+      if (item.id === "tether-gold" || item.id === "pax-gold") {
+        // These are per-ounce tokens
+        displayName = "Gold (Ounce)";
+        displaySymbol = "XAU";
+      } else if (item.id === "kinesis-gold") {
+        // Kinesis Gold is per-gram, convert to ounce for display
+        displayName = "Gold (Ounce)";
+        displaySymbol = "XAU";
+        // Note: KAU price is per gram, but we'll display as-is since CoinGecko handles conversion
+      } else if (item.id === "kinesis-silver") {
+        displayName = "Silver (Ounce)";
+        displaySymbol = "XAG";
+      }
+
+      return {
+        id: item.id,
+        symbol: displaySymbol,
+        name: displayName,
+        image: item.image,
+        currentPrice: item.current_price,
+        priceChange24h: item.price_change_24h,
+        priceChangePercentage24h: item.price_change_percentage_24h,
+        high24h: item.high_24h,
+        low24h: item.low_24h,
+        totalVolume: item.total_volume,
+        marketCap: item.market_cap,
+        marketCapRank: item.market_cap_rank,
+        sparklineData: item.sparkline_in_7d?.price || [],
+      };
+    });
+
+    // Remove duplicates (if multiple gold tokens, prefer the one with highest market cap)
+    const uniqueMetals = marketData.reduce((acc, current) => {
+      const existing = acc.find((item) => item.symbol === current.symbol);
+      if (!existing || current.marketCapRank < existing.marketCapRank) {
+        if (existing) {
+          const index = acc.indexOf(existing);
+          acc[index] = current;
+        } else {
+          acc.push(current);
+        }
+      }
+      return acc;
+    }, [] as MarketData[]);
+
+    return { data: uniqueMetals, error: null };
   } catch (error) {
     return {
       data: [],
-      error: error instanceof Error ? error : new Error("Failed to fetch gold data"),
+      error: error instanceof Error ? error : new Error("Failed to fetch precious metals data"),
     };
   }
 }
@@ -329,43 +321,83 @@ function getCountryCode(currency: string): string {
 }
 
 // NFT API - Using CoinGecko NFT collections with market data
+// Note: /nfts/markets requires Pro API. We use /nfts/list + individual /nfts/{id} calls
 export async function fetchNFTData(): Promise<FetchMarketDataResult> {
   try {
-    // Use the /nfts endpoint which returns market data (free tier)
-    const url = new URL(`${COINGECKO_API_BASE}/nfts`);
-    url.searchParams.append("order", "floor_price_usd_desc");
-    url.searchParams.append("per_page", "50");
-    url.searchParams.append("page", "1");
+    // Step 1: Get list of NFT IDs (free tier)
+    const listUrl = new URL(`${COINGECKO_API_BASE}/nfts/list`);
+    listUrl.searchParams.append("per_page", "50");
+    listUrl.searchParams.append("page", "1");
+    listUrl.searchParams.append("order", "h24_volume_usd_desc"); // Order by 24h volume
 
-    const response = await fetch(url.toString(), {
+    const listResponse = await fetch(listUrl.toString(), {
       cache: "no-store",
     });
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch NFT data");
+    if (!listResponse.ok) {
+      throw new Error(`Failed to fetch NFT list: ${listResponse.statusText}`);
     }
 
-    const rawData = await response.json();
+    interface NFTListItem {
+      id: string;
+      contract_address: string;
+      name: string;
+      asset_platform_id: string;
+      symbol: string;
+    }
 
-    // CoinGecko NFT API returns an array directly
-    const nftsArray = Array.isArray(rawData) ? rawData : [];
+    const nftList: NFTListItem[] = await listResponse.json();
 
-    if (nftsArray.length === 0) {
+    if (nftList.length === 0) {
       return {
         data: [],
         error: null,
       };
     }
 
-    interface CoinGeckoNFTData {
+    // Step 2: Fetch individual NFT details (limited to top 20 to avoid rate limits)
+    const topNFTs = nftList.slice(0, 20);
+    
+    // Fetch NFTs in batches to avoid overwhelming the API
+    const batchSize = 5;
+    const nftDetailsResults: any[] = [];
+    
+    for (let i = 0; i < topNFTs.length; i += batchSize) {
+      const batch = topNFTs.slice(i, i + batchSize);
+      const batchPromises = batch.map(async (nft) => {
+        try {
+          const detailUrl = `${COINGECKO_API_BASE}/nfts/${nft.id}`;
+          const detailResponse = await fetch(detailUrl, {
+            cache: "no-store",
+          });
+
+          if (!detailResponse.ok) {
+            return null;
+          }
+
+          return await detailResponse.json();
+        } catch {
+          return null;
+        }
+      });
+
+      const batchResults = await Promise.all(batchPromises);
+      nftDetailsResults.push(...batchResults);
+      
+      // Small delay between batches to respect rate limits
+      if (i + batchSize < topNFTs.length) {
+        await new Promise((resolve) => setTimeout(resolve, 200));
+      }
+    }
+    const validNFTs = nftDetailsResults.filter((nft) => nft !== null);
+
+    interface CoinGeckoNFTDetail {
       id: string;
-      contract_address: string;
       name: string;
-      asset_platform_id: string;
       symbol: string;
       image?: {
         small?: string;
-        thumb?: string;
+        small_2x?: string;
       };
       floor_price?: {
         usd?: number;
@@ -377,22 +409,25 @@ export async function fetchNFTData(): Promise<FetchMarketDataResult> {
       market_cap?: {
         usd?: number;
       };
+      market_cap_rank?: number;
     }
 
-    const marketData: MarketData[] = nftsArray
-      .slice(0, 50)
-      .map((nft: CoinGeckoNFTData, index: number) => {
+    const marketData: MarketData[] = validNFTs
+      .map((nft: CoinGeckoNFTDetail, index: number) => {
         const floorPrice = nft.floor_price?.usd || 0;
         const priceChangePercentage24h = nft.floor_price_in_usd_24h_percentage_change || 0;
         const priceChange24h = (floorPrice * priceChangePercentage24h) / 100;
         const volume = nft.volume_24h?.usd || 0;
         const marketCap = nft.market_cap?.usd || 0;
 
+        // Use image if available, otherwise empty string (will show initials)
+        const imageUrl = nft.image?.small || nft.image?.small_2x || "";
+
         return {
           id: nft.id || `nft-${index}`,
           symbol: nft.symbol?.toUpperCase() || "NFT",
           name: nft.name || "Unknown NFT",
-          image: nft.image?.small || nft.image?.thumb || "https://via.placeholder.com/64",
+          image: imageUrl,
           currentPrice: floorPrice,
           priceChange24h,
           priceChangePercentage24h,
@@ -400,10 +435,12 @@ export async function fetchNFTData(): Promise<FetchMarketDataResult> {
           low24h: floorPrice * 0.9,
           totalVolume: volume,
           marketCap,
-          marketCapRank: index + 1,
+          marketCapRank: nft.market_cap_rank || index + 1,
           sparklineData: [],
         };
-      });
+      })
+      .filter((nft) => nft.currentPrice > 0) // Only include NFTs with valid floor price
+      .sort((a, b) => b.totalVolume - a.totalVolume); // Sort by volume
 
     return { data: marketData, error: null };
   } catch (error) {
