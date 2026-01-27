@@ -41,7 +41,7 @@ export default function BalanceCard({
           <span className="text-4xl font-bold text-gray-900">{formattedBalance}</span>
           <button
             onClick={() => setIsVisible(!isVisible)}
-            className="p-1 hover:bg-gray-100 rounded transition-colors"
+            className="p-1 hover:bg-gray-100 rounded transition-colors cursor-pointer"
             aria-label={isVisible ? "Hide balance" : "Show balance"}
           >
             {isVisible ? (
@@ -102,7 +102,7 @@ export default function BalanceCard({
         <div className="flex gap-3">
           <Link
             href="/deposit"
-            className="flex-1 bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-[var(--theme-primary)] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>Deposit</span>

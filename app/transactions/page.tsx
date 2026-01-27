@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
 import Header from "@/app/components/Header";
@@ -12,6 +12,7 @@ import SpotBalanceCard from "@/app/components/transactions/SpotBalanceCard";
 import ProfitCard from "@/app/components/transactions/ProfitCard";
 import ContractTradeModal from "@/app/components/transactions/ContractTradeModal";
 import SpotExchangeModal from "@/app/components/transactions/SpotExchangeModal";
+import OptionTradeModal from "@/app/components/transactions/OptionTradeModal";
 import LoadingState from "@/app/components/market/LoadingState";
 import { toast } from "sonner";
 import type { Profile } from "@/lib/types/auth";
@@ -27,15 +28,11 @@ export default function TransactionsPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isContractModalOpen, setIsContractModalOpen] = useState(false);
   const [isSpotModalOpen, setIsSpotModalOpen] = useState(false);
+  const [isOptionModalOpen, setIsOptionModalOpen] = useState(false);
   const [isLoadingSpotData, setIsLoadingSpotData] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadProfileData();
-    }
-  }, [isAuthenticated, user]);
 
-  const loadProfileData = async () => {
+  const loadProfileData = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -50,7 +47,18 @@ export default function TransactionsPage() {
     } catch (error) {
       console.error("Failed to load profile data:", error);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const fetchProfileData = async () => {
+        await loadProfileData();
+      };
+      fetchProfileData();
+    }
+  }, [isAuthenticated, user, loadProfileData]);
+
+  
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -62,6 +70,8 @@ export default function TransactionsPage() {
   const handleStartContractTrade = () => {
     if (activeTradingType === "spot") {
       setIsSpotModalOpen(true);
+    } else if (activeTradingType === "option") {
+      setIsOptionModalOpen(true);
     } else {
       setIsContractModalOpen(true);
     }
@@ -118,7 +128,7 @@ export default function TransactionsPage() {
               {/* Start Spot Trading Button */}
               <button
                 onClick={handleStartContractTrade}
-                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors mb-6"
+                className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-semibold hover:bg-[var(--theme-primary-hover)] transition-colors mb-6 cursor-pointer"
               >
                 Start Spot Trading
               </button>
@@ -158,12 +168,12 @@ export default function TransactionsPage() {
                 <ProfitCard title="Total Profit" value={totalProfit} />
               </div>
 
-              {/* Start Contract Trade Button */}
+              {/* Start Trade Button */}
               <button
                 onClick={handleStartContractTrade}
-                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors mb-6"
+                className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-semibold hover:bg-[var(--theme-primary-hover)] transition-colors mb-6 cursor-pointer"
               >
-                Start Contract Trade
+                {activeTradingType === "option" ? "Start Option Trade" : "Start Contract Trade"}
               </button>
 
               {/* Order Tabs */}
@@ -197,6 +207,11 @@ export default function TransactionsPage() {
       <SpotExchangeModal
         isOpen={isSpotModalOpen}
         onClose={() => setIsSpotModalOpen(false)}
+        availableBalance={totalBalance}
+      />
+      <OptionTradeModal
+        isOpen={isOptionModalOpen}
+        onClose={() => setIsOptionModalOpen(false)}
         availableBalance={totalBalance}
       />
     </div>

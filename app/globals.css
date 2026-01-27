@@ -43,6 +43,15 @@
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+  
+  /* Theme Colors */
+  --color-theme-primary: var(--theme-primary);
+  --color-theme-primary-hover: var(--theme-primary-hover);
+  --color-theme-primary-text: var(--theme-primary-text);
+  --color-theme-success: var(--theme-success);
+  --color-theme-error: var(--theme-error);
+  --color-theme-warning: var(--theme-warning);
+  --color-theme-info: var(--theme-info);
 }
 
 body {
@@ -91,6 +100,62 @@ body {
   --sidebar-accent-foreground: oklch(0.145 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.85 0.18 95);
+
+  /* Theme Colors - Primary Yellow */
+  --theme-primary: #F4D03F;
+  --theme-primary-hover: #F1C40F;
+  --theme-primary-dark: #D4AF37;
+  --theme-primary-text: #854D0E; /* yellow-900 equivalent */
+  --theme-primary-text-light: #A16207; /* yellow-700 equivalent */
+  --theme-primary-text-lighter: #CA8A04; /* yellow-500 equivalent */
+  
+  /* Theme Backgrounds with Opacity */
+  --theme-primary-bg-10: rgba(244, 208, 63, 0.1);
+  --theme-primary-bg-16: rgba(244, 208, 63, 0.16);
+  --theme-primary-bg-5: rgba(244, 208, 63, 0.05);
+  
+  /* Status Colors */
+  --theme-success: #10B981;
+  --theme-success-hover: #059669;
+  --theme-success-light: #D1FAE5;
+  --theme-success-text: #065F46;
+  
+  --theme-error: #EF4444;
+  --theme-error-hover: #DC2626;
+  --theme-error-light: #FEE2E2;
+  --theme-error-text: #991B1B;
+  
+  --theme-warning: #F59E0B;
+  --theme-warning-hover: #D97706;
+  --theme-warning-light: #FEF3C7;
+  --theme-warning-text: #92400E;
+  
+  --theme-info: #3B82F6;
+  --theme-info-hover: #2563EB;
+  --theme-info-light: #DBEAFE;
+  --theme-info-text: #1E40AF;
+  
+  /* Neutral Colors */
+  --theme-gray-50: #F9FAFB;
+  --theme-gray-100: #F3F4F6;
+  --theme-gray-200: #E5E7EB;
+  --theme-gray-300: #D1D5DB;
+  --theme-gray-400: #9CA3AF;
+  --theme-gray-500: #6B7280;
+  --theme-gray-600: #4B5563;
+  --theme-gray-700: #374151;
+  --theme-gray-800: #1F2937;
+  --theme-gray-900: #111827;
+  
+  /* Border Colors */
+  --theme-border: #E5E7EB;
+  --theme-border-light: #F3F4F6;
+  --theme-border-dark: #D1D5DB;
+  
+  /* Background Colors */
+  --theme-bg-white: #FFFFFF;
+  --theme-bg-gray: #F9FAFB;
+  --theme-bg-gray-light: #F3F4F6;
 }
 
 .dark {

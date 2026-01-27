@@ -59,7 +59,7 @@ export default function AIArbitragePage() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-900" />
@@ -68,7 +68,7 @@ export default function AIArbitragePage() {
             </div>
             <button
               onClick={handleMyHosting}
-              className="bg-[#F4D03F] text-yellow-900 px-4 py-2 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors text-sm"
+              className="bg-[var(--theme-primary)] text-[var(--theme-primary-text)] px-4 py-2 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors text-sm cursor-pointer"
             >
               My Hosting
             </button>

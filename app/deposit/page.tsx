@@ -394,7 +394,7 @@ export default function DepositPage() {
                       className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${
                         copied
                           ? "bg-green-600 text-white"
-                          : "bg-[#F4D03F] text-yellow-900 hover:bg-[#F1C40F]"
+                          : "bg-[var(--theme-primary)] text-[var(--theme-primary-text)] hover:bg-[var(--theme-primary-hover)]"
                       }`}
                       aria-label="Copy address"
                     >
@@ -461,7 +461,7 @@ export default function DepositPage() {
                 <button
                   onClick={handleSubmitDeposit}
                   disabled={!uploadedProof}
-                  className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                  className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-medium hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Submit Deposit Request
                 </button>

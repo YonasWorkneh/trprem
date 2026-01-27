@@ -39,7 +39,7 @@ const features: Feature[] = [
     id: "options",
     label: "Options",
     icon: <LayoutGrid className="w-6 h-6" />,
-    href: "/options",
+    href: "/transactions",
   },
   {
     id: "withdraw",
@@ -57,7 +57,7 @@ const features: Feature[] = [
     id: "fast-trade",
     label: "Fast Trade",
     icon: <Zap className="w-6 h-6" />,
-    href: "/fast-trade",
+    href: "/transactions",
   },
 ];
 
@@ -70,10 +70,10 @@ export default function FeatureGrid() {
             <Link
               key={feature.id}
               href={feature.href}
-              className="flex flex-col items-center gap-2 p-4 bg-[rgba(244,208,63,0.1)] rounded-2xl border border-gray-200 hover:bg-[rgba(244,208,63,0.2)] transition-colors"
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--theme-primary-bg-10)] rounded-2xl border border-gray-200 hover:bg-[var(--theme-primary-bg-16)] transition-colors"
             >
-              <div className="text-yellow-500">{feature.icon}</div>
-              <span className="text-xs text-yellow-700 text-center font-medium">
+              <div className="text-[var(--theme-primary-text-lighter)]">{feature.icon}</div>
+              <span className="text-xs text-[var(--theme-primary-text-light)] text-center font-medium">
                 {feature.label}
               </span>
             </Link>

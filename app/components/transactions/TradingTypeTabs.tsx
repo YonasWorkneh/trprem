@@ -13,9 +13,9 @@ export default function TradingTypeTabs({
     <div className="flex items-center gap-6 mb-6">
       <button
         onClick={() => onTabChange("contract")}
-        className={`pb-2 text-sm font-normal transition-colors ${
+        className={`pb-2 text-sm font-normal transition-colors cursor-pointer ${
           activeTab === "contract"
-            ? "text-yellow-900 border-b-2 border-[#F4D03F]"
+            ? "text-[var(--theme-primary-text)] border-b-2 border-[var(--theme-primary)]"
             : "text-gray-600 hover:text-gray-900"
         }`}
       >
@@ -23,9 +23,9 @@ export default function TradingTypeTabs({
       </button>
       <button
         onClick={() => onTabChange("option")}
-        className={`pb-2 text-sm font-normal transition-colors ${
+        className={`pb-2 text-sm font-normal transition-colors cursor-pointer ${
           activeTab === "option"
-            ? "text-yellow-900 border-b-2 border-[#F4D03F]"
+            ? "text-[var(--theme-primary-text)] border-b-2 border-[var(--theme-primary)]"
             : "text-gray-600 hover:text-gray-900"
         }`}
       >
@@ -33,9 +33,9 @@ export default function TradingTypeTabs({
       </button>
       <button
         onClick={() => onTabChange("spot")}
-        className={`pb-2 text-sm font-normal transition-colors ${
+        className={`pb-2 text-sm font-normal transition-colors cursor-pointer ${
           activeTab === "spot"
-            ? "text-yellow-900 border-b-2 border-[#F4D03F]"
+            ? "text-[var(--theme-primary-text)] border-b-2 border-[var(--theme-primary)]"
             : "text-gray-600 hover:text-gray-900"
         }`}
       >

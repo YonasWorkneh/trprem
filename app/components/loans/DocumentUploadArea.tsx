@@ -62,7 +62,7 @@ export default function DocumentUploadArea({
         ) : (
           <button
             onClick={handleUploadClick}
-            className="w-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl p-8 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors"
+            className="w-full flex flex-col items-center justify-center border border-dashed border-gray-300 rounded-xl p-8 bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer"
           >
             <Upload className="w-8 h-8 text-gray-400 mb-2" />
             <span className="text-sm font-medium text-gray-700">

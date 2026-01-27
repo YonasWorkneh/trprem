@@ -29,7 +29,7 @@ export default function MarketsContent() {
       <div className="px-4 pt-6">
         <div className="max-w-7xl mx-auto">
           <div className="mb-4">
-            <button className="bg-[#F4D03F] text-yellow-900 px-4 py-2 rounded-full text-sm font-normal hover:bg-[#F1C40F]">
+            <button className="bg-[var(--theme-primary)] text-[var(--theme-primary-text)] px-4 py-2 rounded-full text-sm font-normal hover:bg-[var(--theme-primary-hover)] cursor-pointer">
               Crypto
             </button>
           </div>
@@ -40,7 +40,7 @@ export default function MarketsContent() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`pb-2 font-normal text-sm cursor-pointer ${
                   activeTab === tab.id
-                    ? "text-gray-900 border-b-2 border-[#F4D03F]"
+                    ? "text-gray-900 border-b-2 border-[var(--theme-primary)]"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >

@@ -45,7 +45,7 @@ export default function Header({ title }: HeaderProps) {
               </Link>
               <Link
                 href="/register"
-                className="bg-[#F4D03F] text-yellow-900 px-4 py-2 rounded-full hover:bg-[#F1C40F] text-sm font-medium"
+                className="bg-[var(--theme-primary)] text-[var(--theme-primary-text)] px-4 py-2 rounded-full hover:bg-[var(--theme-primary-hover)] text-sm font-medium"
               >
                 Sign up
               </Link>

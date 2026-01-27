@@ -84,9 +84,9 @@ export default function MarketTabs() {
               <button
                 key={category.id}
                 onClick={() => setActiveCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-normal transition-colors ${
+                className={`px-4 py-2 rounded-full text-sm font-normal transition-colors cursor-pointer ${
                   activeCategory === category.id
-                    ? "bg-[#F4D03F] text-yellow-900"
+                    ? "bg-[var(--theme-primary)] text-[var(--theme-primary-text)]"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                 }`}
               >
@@ -102,7 +102,7 @@ export default function MarketTabs() {
                   onClick={() => setActiveFilter(filter.id)}
                   className={`pb-2 font-normal text-sm cursor-pointer transition-colors ${
                     activeFilter === filter.id
-                      ? "text-gray-900 border-b-2 border-[#F4D03F]"
+                      ? "text-gray-900 border-b-2 border-[var(--theme-primary)]"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >

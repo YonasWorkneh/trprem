@@ -16,9 +16,9 @@ export default function LoginMethodSelector({
       <button
         type="button"
         onClick={() => onMethodChange("email")}
-        className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors ${
+        className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors cursor-pointer ${
           selectedMethod === "email"
-            ? "bg-[rgba(244,208,63,0.16)] border-[#F4D03F] text-yellow-900"
+            ? "bg-[var(--theme-primary-bg-16)] border-[var(--theme-primary)] text-[var(--theme-primary-text)]"
             : "text-gray-600 border-transparent hover:text-gray-900"
         }`}
       >
@@ -27,9 +27,9 @@ export default function LoginMethodSelector({
       <button
         type="button"
         onClick={() => onMethodChange("mobile")}
-        className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors ${
+        className={`px-4 py-2 w-full text-center text-sm font-normal border-b-2 transition-colors cursor-pointer ${
           selectedMethod === "mobile"
-            ? "bg-[rgba(244,208,63,0.16)] border-[#F4D03F] text-yellow-900"
+            ? "bg-[var(--theme-primary-bg-16)] border-[var(--theme-primary)] text-[var(--theme-primary-text)]"
             : "text-gray-600 border-transparent hover:text-gray-900"
         }`}
       >

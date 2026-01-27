@@ -32,7 +32,7 @@ export default function WatchTradeActions({ coinId }: WatchTradeActionsProps) {
         </button>
         <button
           onClick={handleTrade}
-          className="flex-1 bg-[#F4D03F] cursor-pointer text-yellow-900 py-3 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors"
+          className="flex-1 bg-[var(--theme-primary)] cursor-pointer text-[var(--theme-primary-text)] py-3 rounded-xl font-medium hover:bg-[var(--theme-primary-hover)] transition-colors"
         >
           Trade
         </button>

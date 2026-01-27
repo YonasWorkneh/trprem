@@ -64,7 +64,7 @@ export default function PromoCard({
           <button
             key={index}
             onClick={() => onDotClick(index)}
-            className={`transition-all duration-300 rounded-full ${
+            className={`transition-all duration-300 rounded-full cursor-pointer ${
               currentIndex === index
                 ? "w-8 h-2 bg-white"
                 : "w-2 h-2 bg-white/50 hover:bg-white/75"

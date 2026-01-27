@@ -54,7 +54,7 @@ export default function ProfileItem({
   }
 
   if (onClick) {
-    return <button onClick={onClick} className="w-full text-left">{content}</button>;
+    return <button onClick={onClick} className="w-full text-left cursor-pointer">{content}</button>;
   }
 
   return content;

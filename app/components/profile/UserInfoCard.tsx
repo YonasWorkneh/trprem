@@ -47,7 +47,7 @@ export default function UserInfoCard({ profile, userId }: UserInfoCardProps) {
             <span className="text-sm text-gray-600">ID: {shortId}</span>
             <button
               onClick={handleCopyId}
-              className="p-1 hover:bg-gray-200 rounded transition-colors"
+              className="p-1 hover:bg-gray-200 rounded transition-colors cursor-pointer"
               aria-label="Copy ID"
             >
               <svg

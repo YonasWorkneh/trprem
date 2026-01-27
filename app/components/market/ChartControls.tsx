@@ -37,9 +37,9 @@ export default function ChartControls({ onTimeframeChange }: ChartControlsProps)
               onClick={() => {
                 setActiveTimeframe(tf);
               }}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
                 activeTimeframe === tf
-                  ? "bg-[#F4D03F] text-yellow-900"
+                  ? "bg-[var(--theme-primary)] text-[var(--theme-primary-text)]"
                   : "bg-gray-100 text-gray-700 hover:bg-gray-200"
               }`}
             >
@@ -49,25 +49,25 @@ export default function ChartControls({ onTimeframeChange }: ChartControlsProps)
         </div>
         <div className="flex items-center gap-2">
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Candlestick chart"
           >
             <BarChart3 className="w-4 h-4 text-gray-700" />
           </button>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Bar chart"
           >
             <TrendingUp className="w-4 h-4 text-gray-700" />
           </button>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Line chart"
           >
             <LineChart className="w-4 h-4 text-gray-700" />
           </button>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Drawing tools"
           >
             <Pencil className="w-4 h-4 text-gray-700" />

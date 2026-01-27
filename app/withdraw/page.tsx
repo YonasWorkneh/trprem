@@ -123,21 +123,21 @@ export default function WithdrawPage() {
             </div>
 
             {/* Available Balance Banner */}
-            <div className="bg-[#F4D03F] rounded-2xl p-6 mb-6 relative overflow-hidden">
+            <div className="bg-[var(--theme-primary)] rounded-2xl p-6 mb-6 relative overflow-hidden">
               <div className="relative z-10">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <Wallet className="w-5 h-5 text-yellow-900" />
-                      <span className="text-yellow-900/90 text-sm">Available Balance</span>
+                      <Wallet className="w-5 h-5 text-[var(--theme-primary-text)]" />
+                      <span className="text-[var(--theme-primary-text)]/90 text-sm">Available Balance</span>
                     </div>
-                    <div className="text-4xl font-bold text-yellow-900 mb-2">
+                    <div className="text-4xl font-bold text-[var(--theme-primary-text)] mb-2">
                       ${balance.toLocaleString("en-US", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}
                     </div>
-                    <div className="flex items-center gap-1 text-yellow-900/70 text-xs">
+                    <div className="flex items-center gap-1 text-[var(--theme-primary-text)]/70 text-xs">
                       <Info className="w-4 h-4" />
                       <span>Daily withdrawal limit applies</span>
                     </div>
@@ -283,7 +283,7 @@ export default function WithdrawPage() {
               <button
                 onClick={handleWithdraw}
                 disabled={showKycWarning || calculatedReceive < 0 || !walletAddress || !withdrawalPassword}
-                className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
+                className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-medium hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2"
               >
                 <span>Withdraw Funds</span>
                 <svg

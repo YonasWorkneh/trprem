@@ -29,7 +29,7 @@ export default function CoinDetailHeader({ coin }: CoinDetailHeaderProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsWatched(!isWatched)}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label={isWatched ? "Remove from watchlist" : "Add to watchlist"}
           >
             <Star
@@ -39,7 +39,7 @@ export default function CoinDetailHeader({ coin }: CoinDetailHeaderProps) {
             />
           </button>
           <button
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
             aria-label="Share"
           >
             <Share2 className="w-5 h-5 text-gray-700" />

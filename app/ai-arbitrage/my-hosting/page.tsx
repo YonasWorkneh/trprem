@@ -44,7 +44,7 @@ export default function MyHostingPage() {
           <div className="flex items-center gap-3 py-4 border-b border-gray-200 mb-6">
             <button
               onClick={() => router.back()}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
               aria-label="Go back"
             >
               <ArrowLeft className="w-5 h-5 text-gray-900" />

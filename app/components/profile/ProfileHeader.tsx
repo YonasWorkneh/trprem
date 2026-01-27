@@ -18,7 +18,7 @@ export default function ProfileHeader({
         <button
           onClick={onRefresh}
           disabled={isRefreshing}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           aria-label="Refresh"
         >
           <svg

@@ -110,7 +110,7 @@ export default function ArbitrageProductCard({
       {/* Action Button */}
       <button
         onClick={() => onStartHosting(product.id)}
-        className="w-full bg-[#F4D03F] text-yellow-900 py-3 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors"
+        className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-3 rounded-xl font-semibold hover:bg-[var(--theme-primary-hover)] transition-colors cursor-pointer"
       >
         Start Hosting
       </button>

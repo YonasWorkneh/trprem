@@ -13,9 +13,9 @@ export default function OrderTabs({
     <div className="flex items-center gap-2 mb-4">
       <button
         onClick={() => onTabChange("positions")}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
           activeTab === "positions"
-            ? "bg-[rgba(244,208,63,0.16)] border border-[#F4D03F] text-yellow-900"
+            ? "bg-[var(--theme-primary-bg-16)] border border-[var(--theme-primary)] text-[var(--theme-primary-text)]"
             : "bg-white text-gray-600 hover:text-gray-900"
         }`}
       >
@@ -23,9 +23,9 @@ export default function OrderTabs({
       </button>
       <button
         onClick={() => onTabChange("historical")}
-        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
           activeTab === "historical"
-            ? "bg-[rgba(244,208,63,0.16)] border border-[#F4D03F] text-yellow-900"
+            ? "bg-[var(--theme-primary-bg-16)] border border-[var(--theme-primary)] text-[var(--theme-primary-text)]"
             : "bg-white text-gray-600 hover:text-gray-900"
         }`}
       >

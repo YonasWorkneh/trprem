@@ -33,7 +33,7 @@ export default function SpotBalanceCard({
             </span>
             <button
               onClick={() => setIsBalanceVisible(!isBalanceVisible)}
-              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
               aria-label={isBalanceVisible ? "Hide balance" : "Show balance"}
             >
               {isBalanceVisible ? (
@@ -58,7 +58,7 @@ export default function SpotBalanceCard({
         </div>
       </div>
       <button
-        className="w-10 h-10 bg-[#F4D03F] rounded-lg flex items-center justify-center hover:bg-[#F1C40F] transition-colors"
+        className="w-10 h-10 bg-[#F4D03F] rounded-lg flex items-center justify-center hover:bg-[#F1C40F] transition-colors cursor-pointer"
         aria-label="Exchange"
       >
         <ArrowUpDown className="w-5 h-5 text-yellow-900" />

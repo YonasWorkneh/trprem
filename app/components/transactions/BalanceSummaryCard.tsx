@@ -34,7 +34,7 @@ export default function BalanceSummaryCard({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsBalanceVisible(!isBalanceVisible)}
-            className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
+            className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors cursor-pointer"
             aria-label={isBalanceVisible ? "Hide balance" : "Show balance"}
           >
             {isBalanceVisible ? (

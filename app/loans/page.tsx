@@ -61,7 +61,7 @@ export default function LoansPage() {
             <div className="flex items-center gap-3 flex-1">
               <button
                 onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
                 aria-label="Go back"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-900" />
@@ -79,7 +79,7 @@ export default function LoansPage() {
               <button
                 onClick={handleRefresh}
                 disabled={isRefreshing}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50 cursor-pointer"
                 aria-label="Refresh loans"
               >
                 <RefreshCw

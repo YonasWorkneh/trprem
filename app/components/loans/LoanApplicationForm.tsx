@@ -234,7 +234,7 @@ export default function LoanApplicationForm({
       <button
         onClick={handleSubmit}
         disabled={isSubmitting || !loanAmount || !frontSideFile || !backSideFile}
-        className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
       >
         {isSubmitting ? "Submitting..." : "Apply Now"}
       </button>

@@ -218,7 +218,7 @@ export default function SpotExchangeModal({
             <div className="flex justify-center -my-2">
               <button
                 onClick={handleSwap}
-                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors"
+                className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center hover:bg-gray-200 transition-colors cursor-pointer"
                 aria-label="Swap currencies"
               >
                 <ArrowUpDown className="w-5 h-5 text-gray-700" />
@@ -284,7 +284,7 @@ export default function SpotExchangeModal({
             {/* Confirm Button */}
             <button
               onClick={handleConfirmExchange}
-              className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors"
+              className="w-full bg-[#F4D03F] text-yellow-900 py-4 rounded-xl font-semibold hover:bg-[#F1C40F] transition-colors cursor-pointer"
             >
               Confirm Exchange
             </button>

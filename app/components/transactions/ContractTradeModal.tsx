@@ -138,7 +138,7 @@ export default function ContractTradeModal({
                     <button
                       onClick={handleRefreshPrice}
                       disabled={isRefreshingPrice}
-                      className="p-1 hover:bg-gray-100 rounded transition-colors disabled:opacity-50"
+                      className="p-1 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 cursor-pointer"
                       aria-label="Refresh price"
                     >
                       <RefreshCw
@@ -238,7 +238,7 @@ export default function ContractTradeModal({
                   <button
                     key={value}
                     onClick={() => handleQuickAmount(value)}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors cursor-pointer"
                   >
                     ${value}
                   </button>
@@ -287,7 +287,7 @@ export default function ContractTradeModal({
               </label>
               <button
                 onClick={() => setTakeProfitStopLoss(!takeProfitStopLoss)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
                   takeProfitStopLoss ? "bg-[#F4D03F]" : "bg-gray-300"
                 }`}
                 aria-label="Toggle take profit stop loss"
@@ -304,7 +304,7 @@ export default function ContractTradeModal({
             <div className="space-y-3">
               <button
                 onClick={handleLong}
-                className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-green-600 text-white py-4 rounded-xl font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <TrendingUp className="w-5 h-5" />
                 <span>Long</span>
@@ -314,7 +314,7 @@ export default function ContractTradeModal({
               </p>
               <button
                 onClick={handleShort}
-                className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold hover:bg-red-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <TrendingDown className="w-5 h-5" />
                 <span>Short</span>

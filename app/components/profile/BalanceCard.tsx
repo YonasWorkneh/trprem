@@ -30,7 +30,7 @@ export default function BalanceCard({
           <span className="text-sm text-gray-600">Total Balance</span>
           <button
             onClick={() => setIsVisible(!isVisible)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
+            className="p-1 hover:bg-gray-200 rounded transition-colors cursor-pointer"
             aria-label={isVisible ? "Hide balance" : "Show balance"}
           >
             <svg
@@ -68,7 +68,7 @@ export default function BalanceCard({
           <span className="text-sm text-gray-600">Assets Value</span>
           <button
             onClick={() => setIsVisible(!isVisible)}
-            className="p-1 hover:bg-gray-200 rounded transition-colors"
+            className="p-1 hover:bg-gray-200 rounded transition-colors cursor-pointer"
             aria-label={isVisible ? "Hide assets" : "Show assets"}
           >
             <svg
