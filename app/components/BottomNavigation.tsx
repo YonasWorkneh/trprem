@@ -94,7 +94,7 @@ export default function BottomNavigation() {
                 } hover:bg-gray-100/50`}
               >
                 {renderIcon(item.id, isActive)}
-                <span className="text-[10px] sm:text-xs font-normal truncate w-full text-center">
+                <span className="text-[11px] sm:text-xs font-normal truncate w-full text-center">
                   {item.label}
                 </span>
               </Link>
