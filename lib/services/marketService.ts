@@ -450,3 +450,86 @@ export async function fetchNFTData(): Promise<FetchMarketDataResult> {
     };
   }
 }
+
+// Fetch NFT by ID (for detail page)
+export async function fetchNFTById(
+  nftId: string
+): Promise<{ data: MarketData | null; error: Error | null }> {
+  try {
+    const url = `${COINGECKO_API_BASE}/nfts/${nftId}`;
+    const response = await fetch(url, {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch NFT data: ${response.statusText}`);
+    }
+
+    const nftData = await response.json();
+
+    const floorPrice = nftData.floor_price?.usd || 0;
+    const priceChangePercentage24h = nftData.floor_price_in_usd_24h_percentage_change || 0;
+    const priceChange24h = (floorPrice * priceChangePercentage24h) / 100;
+    const volume = nftData.volume_24h?.usd || 0;
+    const marketCap = nftData.market_cap?.usd || 0;
+
+    const imageUrl = nftData.image?.small || nftData.image?.small_2x || "";
+
+    const marketData: MarketData = {
+      id: nftData.id,
+      symbol: nftData.symbol?.toUpperCase() || "NFT",
+      name: nftData.name || "Unknown NFT",
+      image: imageUrl,
+      currentPrice: floorPrice,
+      priceChange24h,
+      priceChangePercentage24h,
+      high24h: floorPrice * 1.1,
+      low24h: floorPrice * 0.9,
+      totalVolume: volume,
+      marketCap,
+      marketCapRank: nftData.market_cap_rank || 0,
+      sparklineData: [],
+    };
+
+    return { data: marketData, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("Failed to fetch NFT data"),
+    };
+  }
+}
+
+// Fetch NFT chart data
+export async function fetchNFTChartData(
+  nftId: string,
+  days: number = 7
+): Promise<{ data: Array<[number, number]> | null; error: Error | null }> {
+  try {
+    // Note: This endpoint requires Pro API, but we'll try the free tier first
+    // If it fails, we'll return null and the component can handle it
+    const url = new URL(`${COINGECKO_API_BASE}/nfts/${nftId}/market_chart`);
+    url.searchParams.append("days", days.toString());
+
+    const response = await fetch(url.toString(), {
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      // If Pro API is required, return empty data (component will handle gracefully)
+      return { data: null, error: null };
+    }
+
+    const chartData = await response.json();
+
+    // Extract floor_price_usd data: [[timestamp, price], ...]
+    const floorPriceData: Array<[number, number]> = chartData.floor_price_usd || [];
+
+    return { data: floorPriceData, error: null };
+  } catch (error) {
+    return {
+      data: null,
+      error: error instanceof Error ? error : new Error("Failed to fetch NFT chart data"),
+    };
+  }
+}

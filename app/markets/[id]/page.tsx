@@ -8,7 +8,8 @@ import CoinDetailHeader from "@/app/components/market/CoinDetailHeader";
 import AboutSection from "@/app/components/market/AboutSection";
 import WatchTradeActions from "@/app/components/market/WatchTradeActions";
 import TradingViewChart from "@/app/components/market/TradingViewChart";
-import { fetchCoinById } from "@/lib/services/marketService";
+import NFTChart from "@/app/components/market/NFTChart";
+import { fetchCoinById, fetchNFTById } from "@/lib/services/marketService";
 import type { MarketData } from "@/lib/types/market";
 
 export default function MarketDetailPage() {
@@ -18,11 +19,24 @@ export default function MarketDetailPage() {
   const [coin, setCoin] = useState<MarketData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTimeframe, setActiveTimeframe] = useState<string>("15");
+  const [isNFT, setIsNFT] = useState(false);
 
   useEffect(() => {
     const loadCoin = async () => {
       setLoading(true);
-      const result = await fetchCoinById(coinId);
+      // Try fetching as a regular coin first
+      let result = await fetchCoinById(coinId);
+      
+      // If not found as coin, try as NFT
+      if (!result.data) {
+        result = await fetchNFTById(coinId);
+        if (result.data) {
+          setIsNFT(true);
+        }
+      } else {
+        setIsNFT(false);
+      }
+
       if (result.data) {
         setCoin(result.data);
       }
@@ -109,7 +123,11 @@ export default function MarketDetailPage() {
         <CoinDetailHeader coin={coin} />
         <div className="px-4 py-6">
           <div className="max-w-7xl mx-auto">
-            <TradingViewChart symbol={coin.symbol} interval={activeTimeframe} />
+            {isNFT ? (
+              <NFTChart nftId={coinId} days={7} />
+            ) : (
+              <TradingViewChart symbol={coin.symbol} interval={activeTimeframe} />
+            )}
           </div>
         </div>
         <AboutSection coin={coin} />
