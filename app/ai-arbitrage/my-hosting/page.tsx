@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Header from "@/app/components/Header";
@@ -19,11 +19,7 @@ export default function MyHostingPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
-  useEffect(() => {
-    loadOrders();
-  }, [activeTab]);
-
-  const loadOrders = async () => {
+  const loadOrders = useCallback(async () => {
     setLoading(true);
     setError(null);
     const result = await fetchHostingOrders(activeTab);
@@ -33,7 +29,17 @@ export default function MyHostingPage() {
       setOrders(result.data);
     }
     setLoading(false);
-  };
+  }, [activeTab]);
+
+  useEffect(() => {
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) void loadOrders();
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, loadOrders]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">

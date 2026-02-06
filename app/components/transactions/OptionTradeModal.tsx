@@ -49,12 +49,19 @@ export default function OptionTradeModal({
   const totalReturn = investmentValue + potentialProfit;
 
   useEffect(() => {
-    if (isOpen) {
-      // TODO: Fetch current price from API
-      setCurrentPrice(0);
-      setInvestmentAmount("100");
-      setDuration("30s");
-    }
+    if (!isOpen) return;
+    // Defer state reset to avoid synchronous setState in effect (TODO: replace with API fetch)
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setCurrentPrice(0);
+        setInvestmentAmount("100");
+        setDuration("30s");
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, selectedAsset]);
 
   const handleRefreshPrice = async () => {

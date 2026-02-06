@@ -43,10 +43,7 @@ export default function MarketTabs() {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (activeCategory === "crypto") {
-      setOtherCategoryData([]);
-      return;
-    }
+    if (activeCategory === "crypto") return;
 
     const loadData = async () => {
       setLoading(true);
@@ -83,7 +80,10 @@ export default function MarketTabs() {
             {categories.map((category) => (
               <button
                 key={category.id}
-                onClick={() => setActiveCategory(category.id)}
+                onClick={() => {
+                  setActiveCategory(category.id);
+                  if (category.id === "crypto") setOtherCategoryData([]);
+                }}
                 className={`px-4 py-2 rounded-full text-sm font-normal transition-colors cursor-pointer ${
                   activeCategory === category.id
                     ? "bg-[var(--theme-primary)] text-[var(--theme-primary-text)]"

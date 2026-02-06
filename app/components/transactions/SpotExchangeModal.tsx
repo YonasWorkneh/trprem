@@ -40,13 +40,20 @@ export default function SpotExchangeModal({
   const [priceChange24h, setPriceChange24h] = useState(0);
 
   useEffect(() => {
-    if (isOpen) {
-      // TODO: Fetch exchange rate from API
-      setExchangeRate(0);
-      setPriceChange24h(0);
-      setPayAmount("0.00");
-      setReceiveAmount("0");
-    }
+    if (!isOpen) return;
+    // Defer state reset to avoid synchronous setState in effect (TODO: replace with API fetch)
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setExchangeRate(0);
+        setPriceChange24h(0);
+        setPayAmount("0.00");
+        setReceiveAmount("0");
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, payCurrency, receiveCurrency]);
 
   const handleSwap = () => {

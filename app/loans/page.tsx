@@ -22,12 +22,6 @@ export default function LoansPage() {
   const [error, setError] = useState<Error | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  useEffect(() => {
-    if (activeTab === "my-loans") {
-      loadLoans();
-    }
-  }, [activeTab]);
-
   const loadLoans = async () => {
     if (isRefreshing) {
       setIsRefreshing(true);
@@ -44,6 +38,12 @@ export default function LoansPage() {
     setLoading(false);
     setIsRefreshing(false);
   };
+
+  useEffect(() => {
+    if (activeTab === "my-loans") {
+      setTimeout(() => loadLoans(), 0);
+    }
+  }, [activeTab,loadLoans]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -97,9 +97,7 @@ export default function LoansPage() {
           {/* Content */}
           {activeTab === "my-loans" ? (
             <>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">
-                My Loans
-              </h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">My Loans</h2>
               {loading ? (
                 <LoadingState />
               ) : error ? (

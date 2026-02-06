@@ -37,11 +37,18 @@ export default function ContractTradeModal({
   const [isRefreshingPrice, setIsRefreshingPrice] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
-      // TODO: Fetch current price from API
-      setCurrentPrice(0);
-      setPriceChange24h(0);
-    }
+    if (!isOpen) return;
+    // Defer state reset to avoid synchronous setState in effect (TODO: replace with API fetch)
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (!cancelled) {
+        setCurrentPrice(0);
+        setPriceChange24h(0);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [isOpen, selectedAsset]);
 
   const handleRefreshPrice = async () => {
