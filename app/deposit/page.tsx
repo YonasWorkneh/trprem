@@ -20,6 +20,9 @@ import {
 import ethLogo from "@/app/assets/images/eth-logo.png";
 import btcLogo from "@/app/assets/images/btc-logo.png";
 import usdtLogo from "@/app/assets/images/usdt-logo.png";
+import btcDepositQr from "@/app/assets/images/btc-deposit-qr.png";
+import ethDepositQr from "@/app/assets/images/eth-deposit-qr.png";
+import usdtDepositQr from "@/app/assets/images/usdt-deposit-qr.png";
 
 function formatCryptoAddress(address: string): string {
   if (!address || address.length <= 10) return address;
@@ -113,9 +116,9 @@ export default function DepositPage() {
 
   // Mock wallet addresses - in production, fetch from API
   const mockAddresses: Record<string, string> = {
-    ETH: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
-    BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-    USDT: "TQr4xK9v2XH7dL3mN8pW5sY6tZ1aB9cD4eF7gH2jK5",
+    ETH: "0x3F28539B5Be8356858fA65E9927734e04C72876C",
+    BTC: "bc1q8x2j7xc5smv42svk5jm2n3zcp243u8lvu8fn7l",
+    USDT: "0x3F28539B5Be8356858fA65E9927734e04C72876C",
   };
 
   useEffect(() => {
@@ -367,11 +370,37 @@ export default function DepositPage() {
                 {/* QR Code */}
                 <div className="bg-gray-50 rounded-xl p-8 mb-4 flex items-center justify-center min-h-[200px]">
                   {walletAddress ? (
-                    <canvas
-                      ref={qrCanvasRef}
-                      className="w-full max-w-[200px] h-auto"
-                      aria-label="Deposit QR Code"
-                    />
+                    selectedCurrency === "ETH" ? (
+                      <Image
+                        src={ethDepositQr}
+                        alt="Ethereum deposit QR code"
+                        width={200}
+                        height={200}
+                        className="w-full max-w-[200px] h-auto"
+                      />
+                    ) : selectedCurrency === "BTC" ? (
+                      <Image
+                        src={btcDepositQr}
+                        alt="Bitcoin deposit QR code"
+                        width={200}
+                        height={200}
+                        className="w-full max-w-[200px] h-auto"
+                      />
+                    ) : selectedCurrency === "USDT" ? (
+                      <Image
+                        src={usdtDepositQr}
+                        alt="USDT deposit QR code"
+                        width={200}
+                        height={200}
+                        className="w-full max-w-[200px] h-auto"
+                      />
+                    ) : (
+                      <canvas
+                        ref={qrCanvasRef}
+                        className="w-full max-w-[200px] h-auto"
+                        aria-label="Deposit QR Code"
+                      />
+                    )
                   ) : (
                     <div className="text-gray-400">Loading QR code...</div>
                   )}
