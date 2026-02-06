@@ -131,7 +131,9 @@ export default function NFTChart({ nftId, days = 7 }: NFTChartProps) {
               padding: "8px 12px",
             }}
             labelStyle={{ color: "#374151", fontWeight: 600, marginBottom: "4px" }}
-            formatter={(value) => (value != null ? formatPrice(value) : "")}
+            formatter={(value) =>
+              typeof value === "number" ? formatPrice(value) : value != null ? String(value) : ""
+            }
           />
           <Line
             type="monotone"
