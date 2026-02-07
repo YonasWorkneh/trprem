@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
 import Header from "@/app/components/Header";
@@ -100,8 +100,22 @@ function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 
   }
 }
 
+// Level config must match DepositLevelsList on home
+const LEVEL_CONFIG: Record<string, { name: string; minUsd: number }> = {
+  level1: { name: "Level 1", minUsd: 100 },
+  level2: { name: "Level 2", minUsd: 250 },
+  level3: { name: "Level 3", minUsd: 500 },
+  level4: { name: "Level 4", minUsd: 1000 },
+  level5: { name: "Level 5", minUsd: 2500 },
+  level6: { name: "Level 6", minUsd: 5000 },
+  level7: { name: "Level 7", minUsd: 10000 },
+};
+
 export default function DepositPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const levelId = searchParams.get("level") ?? undefined;
+  const level = levelId ? LEVEL_CONFIG[levelId] : undefined;
   const { user, isAuthenticated } = useAuth();
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -209,6 +223,10 @@ export default function DepositPage() {
   };
 
   const handleSubmitDeposit = () => {
+    if (level && estimatedUSDT < level.minUsd) {
+      toast.error(`Minimum for ${level.name} level is $${level.minUsd} USDT`);
+      return;
+    }
     // TODO: Implement deposit submission
     toast.info("Deposit request submission coming soon");
   };
@@ -252,15 +270,22 @@ export default function DepositPage() {
         <div className="px-4 pt-6">
           <div className="max-w-xl mx-auto">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-              <button
-                onClick={() => router.back()}
-                className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
-                aria-label="Back"
-              >
-                <ArrowLeft className="w-5 h-5 text-gray-700" />
-              </button>
-              <h1 className="text-2xl font-bold text-gray-900">Deposit</h1>
+            <div className="flex flex-col gap-3 mb-6">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => router.back()}
+                  className="p-2 hover:bg-gray-100 rounded-full cursor-pointer transition-colors"
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="w-5 h-5 text-gray-700" />
+                </button>
+                <h1 className="text-2xl font-bold text-gray-900">Deposit</h1>
+              </div>
+              {level && (
+                <span className="inline-flex items-center w-fit px-3 py-1.5 rounded-full text-sm font-medium bg-[var(--theme-primary)] text-[var(--theme-primary-text)]">
+                  Level: {level.name} (min. ${level.minUsd} USDT)
+                </span>
+              )}
             </div>
 
             <div className="space-y-6">
@@ -272,6 +297,7 @@ export default function DepositPage() {
                   </label>
                   <span className="text-xs text-gray-500">
                     Min: {minDeposit[selectedCurrency] || 0.01} {selectedCurrency}
+                    {level && ` · Level min: $${level.minUsd} USDT`}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 items-center bg-gray-100/50 rounded-xl p-4">
@@ -489,7 +515,10 @@ export default function DepositPage() {
 
                 <button
                   onClick={handleSubmitDeposit}
-                  disabled={!uploadedProof}
+                  disabled={
+                    !uploadedProof ||
+                    (!!level && estimatedUSDT < level.minUsd)
+                  }
                   className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-medium hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Submit Deposit Request

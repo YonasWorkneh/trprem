@@ -13,13 +13,15 @@ export default function AuthLayout({ children, isLogin = false, showFooter = tru
     <div className="min-h-screen bg-white flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-md flex flex-col items-center">
         {showLogo && (
-        <Image
-          src="/favicon.png"
-          alt="Logo"
-          width={64}
-          height={64}
-          className="object-contain mb-6"
-        />
+          <Link href="/" className="block mb-6">
+            <Image
+              src="/favicon.png"
+              alt="Logo"
+              width={64}
+              height={64}
+              className="object-contain"
+            />
+          </Link>
         )}
         {children}
         {showFooter && <p className="text-sm text-gray-500 mt-8 text-center">

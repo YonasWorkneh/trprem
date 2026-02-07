@@ -3,11 +3,10 @@
 import { useEffect, useState } from "react";
 import Header from "./components/Header";
 import HeroSection from "./components/HeroSection";
-import ContentFilters from "./components/ContentFilters";
 import BottomNavigation from "./components/BottomNavigation";
 import BalanceCard from "./components/home/BalanceCard";
 import FeatureGrid from "./components/home/FeatureGrid";
-import MarketTabs from "./components/home/MarketTabs";
+import DepositLevelsList from "./components/home/DepositLevelsList";
 import PromoCarousel from "./components/home/PromoCarousel";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
@@ -72,13 +71,13 @@ export default function Page() {
               isRefreshing={isRefreshing}
             />
             <FeatureGrid />
-            <MarketTabs />
+            <DepositLevelsList />
             <PromoCarousel />
           </>
         ) : (
           <>
             <HeroSection />
-            <MarketTabs />
+            <DepositLevelsList />
           </>
         )}
       </main>

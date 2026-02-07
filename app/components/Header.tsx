@@ -16,16 +16,15 @@ export default function Header({ title }: HeaderProps) {
     <header className="w-full px-4 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="rounded-full bg-gray-700 p-2">
-
-          <Image
-            src="/favicon.png"
-            alt="Logo"
-            width={32}
-            height={32}
-            className="object-contain"
-          />
-          </div>
+          <Link href="/" className="rounded-full bg-gray-700 p-2 block">
+            <Image
+              src="/favicon.png"
+              alt="Logo"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+          </Link>
           <h1 className="hidden md:block text-lg text-gray-900 tracking-tight capitalize font-bold">
             {title}
           </h1>
