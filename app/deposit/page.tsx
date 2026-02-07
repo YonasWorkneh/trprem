@@ -101,14 +101,17 @@ function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 
 }
 
 // Level config must match DepositLevelsList on home
-const LEVEL_CONFIG: Record<string, { name: string; minUsd: number }> = {
-  level1: { name: "Level 1", minUsd: 100 },
-  level2: { name: "Level 2", minUsd: 250 },
-  level3: { name: "Level 3", minUsd: 500 },
-  level4: { name: "Level 4", minUsd: 1000 },
-  level5: { name: "Level 5", minUsd: 2500 },
-  level6: { name: "Level 6", minUsd: 5000 },
-  level7: { name: "Level 7", minUsd: 10000 },
+const LEVEL_CONFIG: Record<
+  string,
+  { name: string; minUsd: number; maxUsd: number; returnRate: number }
+> = {
+  level1: { name: "Level 1", minUsd: 500, maxUsd: 5000, returnRate: 12 },
+  level2: { name: "Level 2", minUsd: 3000, maxUsd: 10000, returnRate: 15 },
+  level3: { name: "Level 3", minUsd: 20000, maxUsd: 50000, returnRate: 18 },
+  level4: { name: "Level 4", minUsd: 50000, maxUsd: 80000, returnRate: 22 },
+  level5: { name: "Level 5", minUsd: 80000, maxUsd: 150000, returnRate: 26 },
+  level6: { name: "Level 6", minUsd: 150000, maxUsd: 500000, returnRate: 30 },
+  level7: { name: "Level 7", minUsd: 500000, maxUsd: 1000000, returnRate: 35 },
 };
 
 export default function DepositPage() {
@@ -223,9 +226,19 @@ export default function DepositPage() {
   };
 
   const handleSubmitDeposit = () => {
-    if (level && estimatedUSDT < level.minUsd) {
-      toast.error(`Minimum for ${level.name} level is $${level.minUsd} USDT`);
-      return;
+    if (level) {
+      if (estimatedUSDT < level.minUsd) {
+        toast.error(
+          `Deposit for ${level.name} must be at least $${level.minUsd.toLocaleString()} USDT`
+        );
+        return;
+      }
+      if (estimatedUSDT > level.maxUsd) {
+        toast.error(
+          `Deposit for ${level.name} must be at most $${level.maxUsd.toLocaleString()} USDT`
+        );
+        return;
+      }
     }
     // TODO: Implement deposit submission
     toast.info("Deposit request submission coming soon");
@@ -283,7 +296,9 @@ export default function DepositPage() {
               </div>
               {level && (
                 <span className="inline-flex items-center w-fit px-3 py-1.5 rounded-full text-sm font-medium bg-[var(--theme-primary)] text-[var(--theme-primary-text)]">
-                  Level: {level.name} (min. ${level.minUsd} USDT)
+                  {level.name} · {level.returnRate}% return · $
+                  {level.minUsd.toLocaleString()} - $
+                  {level.maxUsd.toLocaleString()} USDT
                 </span>
               )}
             </div>
@@ -297,7 +312,8 @@ export default function DepositPage() {
                   </label>
                   <span className="text-xs text-gray-500">
                     Min: {minDeposit[selectedCurrency] || 0.01} {selectedCurrency}
-                    {level && ` · Level min: $${level.minUsd} USDT`}
+                    {level &&
+                      ` · Level: $${level.minUsd.toLocaleString()} - $${level.maxUsd.toLocaleString()} USDT (${level.returnRate}% return)`}
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-2 items-center bg-gray-100/50 rounded-xl p-4">
@@ -517,7 +533,9 @@ export default function DepositPage() {
                   onClick={handleSubmitDeposit}
                   disabled={
                     !uploadedProof ||
-                    (!!level && estimatedUSDT < level.minUsd)
+                    (!!level &&
+                      (estimatedUSDT < level.minUsd ||
+                        estimatedUSDT > level.maxUsd))
                   }
                   className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-medium hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
