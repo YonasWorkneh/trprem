@@ -1,9 +1,19 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { toast } from "sonner";
+
+// Import logos
+import ethLogo from "@/app/assets/images/eth-logo.png";
+import btcLogo from "@/app/assets/images/btc-logo.png";
+import usdtLogo from "@/app/assets/images/usdt-logo.png";
+
+// Import QR codes
+import ethQr from "@/app/assets/images/eth-deposit-qr.png";
+import btcQr from "@/app/assets/images/btc-deposit-qr.png";
+import usdtQr from "@/app/assets/images/usdt-deposit-qr.png";
 import Header from "@/app/components/Header";
 import BottomNavigation from "@/app/components/BottomNavigation";
 import { ArrowLeft, Copy, Upload, CircleCheck } from "lucide-react";
@@ -17,12 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ethLogo from "@/app/assets/images/eth-logo.png";
-import btcLogo from "@/app/assets/images/btc-logo.png";
-import usdtLogo from "@/app/assets/images/usdt-logo.png";
-import btcDepositQr from "@/app/assets/images/btc-deposit-qr.png";
-import ethDepositQr from "@/app/assets/images/eth-deposit-qr.png";
-import usdtDepositQr from "@/app/assets/images/usdt-deposit-qr.png";
 
 function formatCryptoAddress(address: string): string {
   if (!address || address.length <= 10) return address;
@@ -32,7 +36,11 @@ function formatCryptoAddress(address: string): string {
 }
 
 // Simple QR code generator using canvas
-function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 200) {
+function generateQRCode(
+  canvas: HTMLCanvasElement,
+  text: string,
+  size: number = 200,
+) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
@@ -49,7 +57,9 @@ function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 
   const moduleSize = size / 25;
 
   // Generate deterministic pattern based on text
-  const hash = text.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const hash = text
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
   // Draw corner markers (standard QR code pattern)
   const drawCornerMarker = (x: number, y: number) => {
@@ -58,24 +68,44 @@ function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 
     ctx.fillRect(x, y, moduleSize * 7, moduleSize * 7);
     // Inner white square (5x5 modules)
     ctx.fillStyle = "#ffffff";
-    ctx.fillRect(x + moduleSize, y + moduleSize, moduleSize * 5, moduleSize * 5);
+    ctx.fillRect(
+      x + moduleSize,
+      y + moduleSize,
+      moduleSize * 5,
+      moduleSize * 5,
+    );
     // Center black square (3x3 modules)
     ctx.fillStyle = "#000000";
-    ctx.fillRect(x + moduleSize * 2, y + moduleSize * 2, moduleSize * 3, moduleSize * 3);
+    ctx.fillRect(
+      x + moduleSize * 2,
+      y + moduleSize * 2,
+      moduleSize * 3,
+      moduleSize * 3,
+    );
   };
 
   // Draw three corner markers
   drawCornerMarker(0, 0);
-  drawCornerMarker((size - moduleSize * 7), 0);
-  drawCornerMarker(0, (size - moduleSize * 7));
+  drawCornerMarker(size - moduleSize * 7, 0);
+  drawCornerMarker(0, size - moduleSize * 7);
 
   // Draw alignment pattern (small square in bottom-right area)
   const alignX = size - moduleSize * 7;
   const alignY = size - moduleSize * 7;
   ctx.fillStyle = "#000000";
-  ctx.fillRect(alignX + moduleSize * 2, alignY + moduleSize * 2, moduleSize * 3, moduleSize * 3);
+  ctx.fillRect(
+    alignX + moduleSize * 2,
+    alignY + moduleSize * 2,
+    moduleSize * 3,
+    moduleSize * 3,
+  );
   ctx.fillStyle = "#ffffff";
-  ctx.fillRect(alignX + moduleSize * 3, alignY + moduleSize * 3, moduleSize, moduleSize);
+  ctx.fillRect(
+    alignX + moduleSize * 3,
+    alignY + moduleSize * 3,
+    moduleSize,
+    moduleSize,
+  );
 
   // Draw data pattern based on text hash
   ctx.fillStyle = "#000000";
@@ -92,7 +122,8 @@ function generateQRCode(canvas: HTMLCanvasElement, text: string, size: number = 
       }
 
       // Generate pattern based on hash and position
-      const seed = (hash + i * 25 + j + text.charCodeAt(i % text.length || 0)) % 5;
+      const seed =
+        (hash + i * 25 + j + text.charCodeAt(i % text.length || 0)) % 5;
       if (seed < 2) {
         ctx.fillRect(i * moduleSize, j * moduleSize, moduleSize, moduleSize);
       }
@@ -114,7 +145,7 @@ const LEVEL_CONFIG: Record<
   level7: { name: "Level 7", minUsd: 500000, maxUsd: 1000000, returnRate: 35 },
 };
 
-export default function DepositPage() {
+function DepositContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const levelId = searchParams.get("level") ?? undefined;
@@ -194,7 +225,7 @@ export default function DepositPage() {
 
   const handleCopyAddress = async () => {
     if (!walletAddress) return;
-    
+
     try {
       await navigator.clipboard.writeText(walletAddress);
       setCopied(true);
@@ -229,13 +260,13 @@ export default function DepositPage() {
     if (level) {
       if (estimatedUSDT < level.minUsd) {
         toast.error(
-          `Deposit for ${level.name} must be at least $${level.minUsd.toLocaleString()} USDT`
+          `Deposit for ${level.name} must be at least $${level.minUsd.toLocaleString()} USDT`,
         );
         return;
       }
       if (estimatedUSDT > level.maxUsd) {
         toast.error(
-          `Deposit for ${level.name} must be at most $${level.maxUsd.toLocaleString()} USDT`
+          `Deposit for ${level.name} must be at most $${level.maxUsd.toLocaleString()} USDT`,
         );
         return;
       }
@@ -264,7 +295,7 @@ export default function DepositPage() {
     USDT: 10,
   };
 
-  const coinLogos: Record<string, typeof ethLogo> = {
+  const coinLogos: Record<string, any> = {
     ETH: ethLogo,
     BTC: btcLogo,
     USDT: usdtLogo,
@@ -311,7 +342,8 @@ export default function DepositPage() {
                     Enter Amount
                   </label>
                   <span className="text-xs text-gray-500">
-                    Min: {minDeposit[selectedCurrency] || 0.01} {selectedCurrency}
+                    Min: {minDeposit[selectedCurrency] || 0.01}{" "}
+                    {selectedCurrency}
                     {level &&
                       ` · Level: $${level.minUsd.toLocaleString()} - $${level.maxUsd.toLocaleString()} USDT (${level.returnRate}% return)`}
                   </span>
@@ -345,7 +377,10 @@ export default function DepositPage() {
                       </SelectValue>
                     </SelectTrigger>
                     <SelectContent className="bg-white">
-                      <SelectItem value="ETH" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                      <SelectItem
+                        value="ETH"
+                        className="text-gray-900 focus:text-gray-900 focus:bg-gray-100"
+                      >
                         <div className="flex items-center gap-2">
                           <Image
                             src={ethLogo}
@@ -357,7 +392,10 @@ export default function DepositPage() {
                           <span>Ethereum (ETH)</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="BTC" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                      <SelectItem
+                        value="BTC"
+                        className="text-gray-900 focus:text-gray-900 focus:bg-gray-100"
+                      >
                         <div className="flex items-center gap-2">
                           <Image
                             src={btcLogo}
@@ -369,7 +407,10 @@ export default function DepositPage() {
                           <span>Bitcoin (BTC)</span>
                         </div>
                       </SelectItem>
-                      <SelectItem value="USDT" className="text-gray-900 focus:text-gray-900 focus:bg-gray-100">
+                      <SelectItem
+                        value="USDT"
+                        className="text-gray-900 focus:text-gray-900 focus:bg-gray-100"
+                      >
                         <div className="flex items-center gap-2">
                           <Image
                             src={usdtLogo}
@@ -414,7 +455,7 @@ export default function DepositPage() {
                   {walletAddress ? (
                     selectedCurrency === "ETH" ? (
                       <Image
-                        src={ethDepositQr}
+                        src={ethQr}
                         alt="Ethereum deposit QR code"
                         width={200}
                         height={200}
@@ -422,7 +463,7 @@ export default function DepositPage() {
                       />
                     ) : selectedCurrency === "BTC" ? (
                       <Image
-                        src={btcDepositQr}
+                        src={btcQr}
                         alt="Bitcoin deposit QR code"
                         width={200}
                         height={200}
@@ -430,7 +471,7 @@ export default function DepositPage() {
                       />
                     ) : selectedCurrency === "USDT" ? (
                       <Image
-                        src={usdtDepositQr}
+                        src={usdtQr}
                         alt="USDT deposit QR code"
                         width={200}
                         height={200}
@@ -456,17 +497,18 @@ export default function DepositPage() {
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
-                      value={walletAddress ? formatCryptoAddress(walletAddress) : ""}
+                      value={
+                        walletAddress ? formatCryptoAddress(walletAddress) : ""
+                      }
                       readOnly
                       className="flex-1 py-3 px-4 border border-gray-300 rounded-xl text-gray-900 bg-gray-50 font-mono text-sm focus:outline-none"
                     />
                     <button
                       onClick={handleCopyAddress}
-                      className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${
-                        copied
-                          ? "bg-green-600 text-white"
-                          : "bg-[var(--theme-primary)] text-[var(--theme-primary-text)] hover:bg-[var(--theme-primary-hover)]"
-                      }`}
+                      className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${copied
+                        ? "bg-green-600 text-white"
+                        : "bg-[var(--theme-primary)] text-[var(--theme-primary-text)] hover:bg-[var(--theme-primary-hover)]"
+                        }`}
                       aria-label="Copy address"
                     >
                       {copied ? (
@@ -495,9 +537,8 @@ export default function DepositPage() {
               {uploadedProof ? (
                 <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                   
-                      <CircleCheck className="w-5 h-5 text-green-700" />
-                  
+                    <CircleCheck className="w-5 h-5 text-green-700" />
+
                     <div>
                       <p className="text-sm font-medium text-gray-900">
                         Proof uploaded
@@ -528,7 +569,6 @@ export default function DepositPage() {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-
                 <button
                   onClick={handleSubmitDeposit}
                   disabled={
@@ -554,5 +594,21 @@ export default function DepositPage() {
         initialFile={uploadedProof}
       />
     </div>
+  );
+}
+
+export default function DepositPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header title="trade prememium" />
+        <main className="flex-1 pb-20 px-4 flex items-center justify-center">
+          <div className="animate-pulse text-gray-500">Loading...</div>
+        </main>
+        <BottomNavigation />
+      </div>
+    }>
+      <DepositContent />
+    </Suspense>
   );
 }
