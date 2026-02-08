@@ -13,21 +13,21 @@ import { supabase } from "./supabase";
 export const PAYMENT_CONFIG = {
     // Stripe Configuration (for fiat payments)
     stripe: {
-        publicKey: import.meta.env.VITE_STRIPE_PUBLIC_KEY || '',
-        secretKey: import.meta.env.VITE_STRIPE_SECRET_KEY || '',
-        webhookSecret: import.meta.env.VITE_STRIPE_WEBHOOK_SECRET || '',
+        publicKey: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || '',
+        secretKey: process.env.STRIPE_SECRET_KEY || '',
+        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET || '',
     },
 
     // Coinbase Commerce Configuration (for crypto payments)
     coinbase: {
-        apiKey: import.meta.env.VITE_COINBASE_COMMERCE_API_KEY || '',
-        webhookSecret: import.meta.env.VITE_COINBASE_WEBHOOK_SECRET || '',
+        apiKey: process.env.COINBASE_COMMERCE_API_KEY || '',
+        webhookSecret: process.env.COINBASE_WEBHOOK_SECRET || '',
     },
 
     // NOWPayments Configuration (alternative crypto gateway)
     nowpayments: {
-        apiKey: import.meta.env.VITE_NOWPAYMENTS_API_KEY || '',
-        ipnSecret: import.meta.env.VITE_NOWPAYMENTS_IPN_SECRET || '',
+        apiKey: process.env.NOWPAYMENTS_API_KEY || '',
+        ipnSecret: process.env.NOWPAYMENTS_IPN_SECRET || '',
     },
 };
 
