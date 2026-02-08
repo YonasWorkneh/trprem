@@ -129,7 +129,7 @@ const AdminWithdrawalsPanel = () => {
       }
 
       refetchWithdrawals();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Status update error:", error);
       toast.error("Failed to update status: " + error.message);
     }
@@ -242,13 +242,12 @@ const AdminWithdrawalsPanel = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      className={`capitalize ${
-                        withdrawal.status === "completed" || withdrawal.status === "approved"
+                      className={`capitalize ${withdrawal.status === "completed" || withdrawal.status === "approved"
                           ? "bg-green-500/15 text-green-600 border-green-200"
                           : withdrawal.status === "pending"
-                          ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                          : "bg-red-500/15 text-red-600 border-red-200"
-                      }`}
+                            ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                            : "bg-red-500/15 text-red-600 border-red-200"
+                        }`}
                       variant="outline"
                     >
                       {withdrawal.status}
@@ -336,14 +335,13 @@ const AdminWithdrawalsPanel = () => {
                       </div>
                     </div>
                     <Badge
-                      className={`capitalize flex-shrink-0 ${
-                        withdrawal.status === "completed" ||
-                        withdrawal.status === "approved"
+                      className={`capitalize flex-shrink-0 ${withdrawal.status === "completed" ||
+                          withdrawal.status === "approved"
                           ? "bg-green-500/15 text-green-600 border-green-200"
                           : withdrawal.status === "pending"
-                          ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                          : "bg-red-500/15 text-red-600 border-red-200"
-                      }`}
+                            ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                            : "bg-red-500/15 text-red-600 border-red-200"
+                        }`}
                       variant="outline"
                     >
                       {withdrawal.status}

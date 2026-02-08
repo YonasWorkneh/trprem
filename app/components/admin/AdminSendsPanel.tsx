@@ -62,13 +62,13 @@ const AdminSendsPanel = () => {
             if (withdrawalsError) throw withdrawalsError;
 
             if (withdrawalsData && withdrawalsData.length > 0) {
-                const userIds = [...new Set(withdrawalsData.map(w => w.user_id))];
+                const userIds = [...new Set(withdrawalsData.map((w: any) => w.user_id))];
                 const { data: usersData } = await supabase
                     .from('users')
                     .select('id, email, name')
                     .in('id', userIds);
 
-                const sendsWithUsers = withdrawalsData.map(send => ({
+                const sendsWithUsers = withdrawalsData.map((send: any) => ({
                     ...send,
                     user: usersData?.find(u => u.id === send.user_id)
                 }));
@@ -238,13 +238,12 @@ const AdminSendsPanel = () => {
                                             </div>
                                         </div>
                                         <Badge
-                                            className={`capitalize flex-shrink-0 ${
-                                                send.status === 'completed'
-                                                    ? 'bg-green-500/15 text-green-600 border-green-200'
-                                                    : send.status === 'pending'
+                                            className={`capitalize flex-shrink-0 ${send.status === 'completed'
+                                                ? 'bg-green-500/15 text-green-600 border-green-200'
+                                                : send.status === 'pending'
                                                     ? 'bg-yellow-500/15 text-yellow-600 border-yellow-200'
                                                     : 'bg-red-500/15 text-red-600 border-red-200'
-                                            }`}
+                                                }`}
                                             variant="outline"
                                         >
                                             {send.status}

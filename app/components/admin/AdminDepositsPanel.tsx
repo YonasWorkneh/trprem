@@ -160,7 +160,7 @@ const AdminDepositsPanel = () => {
       }
 
       refetchDeposits();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Status update error:", error);
       toast.error("Failed to update status: " + error.message);
     }
@@ -324,15 +324,14 @@ const AdminDepositsPanel = () => {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`capitalize ${
-                          deposit.status === "credited" ||
-                          deposit.status === "confirmed"
+                        className={`capitalize ${deposit.status === "credited" ||
+                            deposit.status === "confirmed"
                             ? "bg-green-500/15 text-green-600 border-green-200"
                             : deposit.status === "pending" ||
                               deposit.status === "reported"
-                            ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                            : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
+                              ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                              : "bg-red-500/15 text-red-600 border-red-200"
+                          }`}
                         variant="outline"
                       >
                         {deposit.status}
@@ -341,26 +340,26 @@ const AdminDepositsPanel = () => {
                     <TableCell className="text-right pr-6">
                       {(deposit.status === "pending" ||
                         deposit.status === "reported") && (
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                            onClick={() => handleStatusUpdate(deposit, "reject")}
-                            title="Reject"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => handleStatusUpdate(deposit, "approve")}
-                            title="Approve & Credit"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                              onClick={() => handleStatusUpdate(deposit, "reject")}
+                              title="Reject"
+                            >
+                              <XCircle className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() => handleStatusUpdate(deposit, "approve")}
+                              title="Approve & Credit"
+                            >
+                              <CheckCircle className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -408,15 +407,14 @@ const AdminDepositsPanel = () => {
                         </div>
                       </div>
                       <Badge
-                        className={`capitalize flex-shrink-0 ${
-                          deposit.status === "credited" ||
-                          deposit.status === "confirmed"
+                        className={`capitalize flex-shrink-0 ${deposit.status === "credited" ||
+                            deposit.status === "confirmed"
                             ? "bg-green-500/15 text-green-600 border-green-200"
                             : deposit.status === "pending" ||
                               deposit.status === "reported"
-                            ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                            : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
+                              ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                              : "bg-red-500/15 text-red-600 border-red-200"
+                          }`}
                         variant="outline"
                       >
                         {deposit.status}
@@ -531,26 +529,26 @@ const AdminDepositsPanel = () => {
                     {/* Action Buttons */}
                     {(deposit.status === "pending" ||
                       deposit.status === "reported") && (
-                      <div className="flex gap-2 pt-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                          onClick={() => handleStatusUpdate(deposit, "reject")}
-                        >
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Reject
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                          onClick={() => handleStatusUpdate(deposit, "approve")}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Approve
-                        </Button>
-                      </div>
-                    )}
+                        <div className="flex gap-2 pt-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                            onClick={() => handleStatusUpdate(deposit, "reject")}
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => handleStatusUpdate(deposit, "approve")}
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Approve
+                          </Button>
+                        </div>
+                      )}
                   </CardContent>
                 </Card>
               ))

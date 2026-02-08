@@ -133,7 +133,7 @@ const AdminSupportPanel = () => {
       } else {
         throw new Error(result.error || "Failed to send reply");
       }
-    } catch (error) {
+    } catch (error: any) {
       toast.error("Error", {
         description: error.message,
       });
