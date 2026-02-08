@@ -125,7 +125,7 @@ export async function getUserTickets(userId: string): Promise<SupportTicket[]> {
 
         if (error) throw error;
         return data || [];
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching user tickets:', error);
         return [];
     }
@@ -164,7 +164,7 @@ export async function getAllTickets(): Promise<SupportTicketWithMessages[]> {
         );
 
         return ticketsWithMessages;
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching all tickets:', error);
         return [];
     }

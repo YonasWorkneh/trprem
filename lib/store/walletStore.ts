@@ -222,7 +222,7 @@ export const useWalletStore = create<WalletState>()(
             const { useTradingStore } = await import("./tradingStore");
             useTradingStore.getState().syncWithWalletBalance(balanceInUSD);
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to fetch balance:", error);
         }
       },
@@ -437,7 +437,7 @@ export const useWalletStore = create<WalletState>()(
           const allTxs = [...normalizedDeposits, ...normalizedWithdrawals, ...normalizedTxs].sort((a, b) => b.timestamp - a.timestamp);
 
           set({ transactions: allTxs });
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to fetch transactions:", error);
         }
       },
@@ -478,7 +478,7 @@ export const useWalletStore = create<WalletState>()(
               network: tx.network,
             });
           }
-        } catch (error) {
+        } catch (error: any) {
           console.error("Failed to persist transaction:", error);
         }
       },

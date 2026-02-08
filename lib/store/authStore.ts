@@ -3,6 +3,16 @@ import { supabase } from "@/lib/supabase";
 import type { User as SupabaseUser } from "@supabase/supabase-js";
 import { clearBalanceCache } from "@/lib/balanceSnapshot";
 
+export interface UserPreferences {
+  priceAlerts?: boolean;
+  tradeNotifications?: boolean;
+  emailNotifications?: boolean;
+  phone?: string;
+  demo_balance?: number;
+  apiKeys?: Array<{ key: string; createdAt: number; label: string }>;
+  hasSeenWelcome?: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -12,15 +22,7 @@ export interface User {
   avatarUrl?: string;
   phone?: string;
   role?: "user" | "admin";
-  preferences?: {
-    priceAlerts?: boolean;
-    tradeNotifications?: boolean;
-    emailNotifications?: boolean;
-    phone?: string;
-    demo_balance?: number;
-    apiKeys?: Array<{ key: string; createdAt: number; label: string }>;
-    hasSeenWelcome?: boolean;
-  };
+  preferences?: UserPreferences;
 }
 
 interface AuthState {
@@ -69,7 +71,7 @@ interface AuthState {
     newPassword: string
   ) => Promise<{ success: boolean; error?: string }>;
   updatePreferences: (
-    preferences
+    preferences: UserPreferences
   ) => Promise<{ success: boolean; error?: string }>;
   deleteAccount: () => Promise<{ success: boolean; error?: string }>;
   generateApiKey: () => Promise<{
@@ -129,7 +131,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // OTP code sent successfully
       return { success: true, confirmationRequired: true };
-    } catch (error) {
+    } catch (error: any) {
       sessionStorage.removeItem("pending_user_name");
       sessionStorage.removeItem("pending_user_email");
       sessionStorage.removeItem("pending_user_password");
@@ -177,7 +179,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       // OTP code sent successfully
       return { success: true, confirmationRequired: true };
-    } catch (error) {
+    } catch (error: any) {
       sessionStorage.removeItem("pending_user_name");
       sessionStorage.removeItem("pending_user_email");
       sessionStorage.removeItem("pending_user_phone");
@@ -204,7 +206,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       return { success: true, confirmationRequired: true };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to send verification code",
@@ -328,7 +330,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set({ isLoading: false });
       return { success: false, error: "Verification failed" };
-    } catch (error) {
+    } catch (error: any) {
       set({ isLoading: false });
       return { success: false, error: error.message || "Verification failed" };
     }
@@ -390,7 +392,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
       set({ isLoading: false });
       return { success: false, error: "Login failed" };
-      } catch (error) {
+      } catch (error: any) {
       console.error("authStore: unexpected error", error);
       set({ isLoading: false });
       return { success: false, error: error?.message || "Login failed" };
@@ -436,7 +438,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       if (error) throw error;
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Password reset failed",
@@ -456,7 +458,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       }
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Password update failed",
@@ -465,7 +467,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
   },
 
   // Update preferences
-  updatePreferences: async (preferences) => {
+  updatePreferences: async (preferences: UserPreferences) => {
     try {
       const { user } = get();
       if (!user) return { success: false, error: "Not authenticated" };
@@ -482,7 +484,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: updatedUser });
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to update preferences",
@@ -507,7 +509,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: null, isAuthenticated: false });
 
       return { success: true };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to delete account",
@@ -547,7 +549,7 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       set({ user: updatedUser });
 
       return { success: true, apiKey: newKey };
-    } catch (error) {
+    } catch (error: any) {
       return {
         success: false,
         error: error.message || "Failed to generate API key",
