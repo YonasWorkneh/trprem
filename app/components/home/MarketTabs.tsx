@@ -8,6 +8,7 @@ import { fetchGoldData, fetchForexData, fetchNFTData } from "@/lib/services/mark
 import LoadingState from "../market/LoadingState";
 import ErrorState from "../market/ErrorState";
 import EmptyState from "../market/EmptyState";
+import DepositLevelsList from "./DepositLevelsList";
 
 type MarketCategory = "crypto" | "gold" | "forex" | "nft";
 
@@ -84,11 +85,10 @@ export default function MarketTabs() {
                   setActiveCategory(category.id);
                   if (category.id === "crypto") setOtherCategoryData([]);
                 }}
-                className={`px-4 py-2 rounded-full text-sm font-normal transition-colors cursor-pointer ${
-                  activeCategory === category.id
+                className={`px-4 py-2 rounded-full text-sm font-normal transition-colors cursor-pointer ${activeCategory === category.id
                     ? "bg-[var(--theme-primary)] text-[var(--theme-primary-text)]"
                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
-                }`}
+                  }`}
               >
                 {category.label}
               </button>
@@ -100,11 +100,10 @@ export default function MarketTabs() {
                 <button
                   key={filter.id}
                   onClick={() => setActiveFilter(filter.id)}
-                  className={`pb-2 font-normal text-sm cursor-pointer transition-colors ${
-                    activeFilter === filter.id
+                  className={`pb-2 font-normal text-sm cursor-pointer transition-colors ${activeFilter === filter.id
                       ? "text-gray-900 border-b-2 border-[var(--theme-primary)]"
                       : "text-gray-600 hover:text-gray-900"
-                  }`}
+                    }`}
                 >
                   {filter.label}
                 </button>
@@ -120,7 +119,9 @@ export default function MarketTabs() {
       )}
       {activeCategory !== "crypto" && (
         <div className="mt-4">
-          {loading ? (
+          {activeCategory === "nft" ? (
+            <DepositLevelsList />
+          ) : loading ? (
             <LoadingState />
           ) : error ? (
             <ErrorState message={error.message} onRetry={() => {
