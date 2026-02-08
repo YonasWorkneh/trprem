@@ -4,7 +4,8 @@
  * Ensures balance never shows $0 on refresh
  */
 
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
+
 
 const BALANCE_CACHE_KEY = 'balance_snapshot';
 const CACHE_EXPIRY_MS = 5 * 60 * 1000; // 5 minutes
