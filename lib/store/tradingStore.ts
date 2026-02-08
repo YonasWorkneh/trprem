@@ -271,7 +271,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           }
         );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching USDT balance:", error);
     }
   },
@@ -508,7 +508,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           withdrawalHistory,
         }));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error fetching trading data:", error);
     } finally {
       if (showLoading) set({ isLoading: false });
@@ -708,7 +708,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
         orderHistory: [],
         withdrawalHistory: [],
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error resetting demo account:", error);
     }
   },
@@ -850,7 +850,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
 
           // Refresh local balance after deduction
           await get().fetchUSDTBalance();
-        } catch (error) {
+        } catch (error: any) {
           console.error("[deductUSDT] Error:", error);
           throw error;
         }
@@ -1310,7 +1310,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
         } else {
           console.warn("[creditUSDTToDB] No wallets found to credit");
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("[creditUSDTToDB] Error:", err);
         throw err;
       }
@@ -1334,7 +1334,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           asset: "USDT",
           timestamp: new Date().toISOString(),
         });
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error recording transaction:", err);
       }
     };
@@ -1356,7 +1356,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           contractOutcomeMode =
             get().systemSettings.contract_outcome_mode || "fair";
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error(
           "[Contract Expiration] Error fetching system settings:",
           error
@@ -1435,7 +1435,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           const { data: userData } = await supabase
             .from("users")
             .select("trading_balance")
-            .eq("id", user.id)
+            .eq("id", user?.id)
             .single();
 
           if (!userData) throw new Error("User data not found");
@@ -1479,7 +1479,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
             const { error: balanceError } = await supabase
               .from("users")
               .update({ trading_balance: newTradingBalance })
-              .eq("id", user.id);
+              .eq("id", user?.id);
 
             if (balanceError) throw balanceError;
 
@@ -1504,7 +1504,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
           const { data: tradeRecords, error: findError } = await supabase
             .from("trades")
             .select("id")
-            .eq("user_id", user.id)
+            .eq("user_id", user?.id)
             .eq("asset", contract.assetId)
             .eq("type", contract.side)
             .eq("status", "open")
@@ -1796,7 +1796,7 @@ export const useTradingStore = create<TradingState>()((set, get) => ({
 
           // Record transaction for live mode
           await supabase.from("wallet_transactions").insert({
-            user_id: user.id,
+            user_id: user?.id,
             type: "trade_pnl",
             amount: returnAmount, // Positive for return (margin + pnl)
             status: "completed",

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { supabase } from '@/lib/supabase';
-import { toast } from '@/hooks/use-toast';
+// import { toast } from '@/hooks/use-toast';
 import { useAuthStore as useAuthStoreHook } from './authStore';
 
 export interface Notification {
@@ -168,13 +168,6 @@ export const useNotificationStore = create<NotificationState>()(
                               notifications: [formatted, ...state.notifications],
                               unreadCount: state.unreadCount + 1,
                           }));
-
-                          // Show toast
-                          toast({
-                              title: formatted.title,
-                              description: formatted.message,
-                              variant: formatted.type === 'error' ? 'destructive' : 'default',
-                          });
                       }
                   });
               }

@@ -47,7 +47,7 @@ export async function getSystemSettings(): Promise<SystemSettings> {
     console.log("[Admin Settings] Settings loaded successfully:", data);
     // Merge with defaults to ensure all fields exist
     return { ...DEFAULT_SETTINGS, ...data };
-  } catch (error) {
+  } catch (error: any) {
     console.error("[Admin Settings] Exception in getSystemSettings:", error);
     return DEFAULT_SETTINGS;
   }
@@ -118,7 +118,7 @@ export async function updateSystemSetting(
       );
       return true;
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(`[Admin Settings] Error updating setting ${key}:`, error);
     return false;
   }

@@ -44,7 +44,7 @@ export function getCachedBalance(userId: string): number | null {
         }
 
         return snapshot.total_balance;
-    } catch (error) {
+    } catch (error: any) {
         console.error('[BalanceSnapshot] Error reading cache:', error);
         return null;
     }
@@ -64,7 +64,7 @@ export function setCachedBalance(userId: string, totalBalance: number, wallets?:
 
         localStorage.setItem(BALANCE_CACHE_KEY, JSON.stringify(snapshot));
         console.log('[BalanceSnapshot] Cache updated:', totalBalance);
-    } catch (error) {
+    } catch (error: any) {
         console.error('[BalanceSnapshot] Error saving cache:', error);
     }
 }
@@ -86,7 +86,7 @@ export async function getSnapshotFromDB(userId: string): Promise<number | null> 
         }
 
         return data?.total_balance || null;
-    } catch (error) {
+    } catch (error: any) {
         console.error('[BalanceSnapshot] Error fetching snapshot:', error);
         return null;
     }
@@ -106,7 +106,7 @@ export async function updateSnapshotInDB(userId: string): Promise<void> {
         } else {
             console.log('[BalanceSnapshot] DB snapshot updated');
         }
-    } catch (error) {
+    } catch (error: any) {
         console.error('[BalanceSnapshot] Error calling update function:', error);
     }
 }

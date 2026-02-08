@@ -225,7 +225,7 @@ export async function getWalletBalance(
 
     if (error) throw error;
     return data?.balance || 0;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching wallet balance:", error);
     return 0;
   }
@@ -254,7 +254,7 @@ export async function createUSDTWallet(
 
     if (error) throw error;
     return data;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating USDT wallet:", error);
     return null;
   }
@@ -299,7 +299,7 @@ export async function getCreditedDeposits(
     });
 
     return depositWallets;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching credited deposits:", error);
     return [];
   }
@@ -323,7 +323,7 @@ export async function getUserWallets(userId: string): Promise<USDTWallet[]> {
       ...wallet,
       network: normalizeNetworkName(wallet.network),
     }));
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching user wallets:", error);
     return [];
   }
@@ -370,7 +370,7 @@ export async function getAllUserWallets(userId: string): Promise<USDTWallet[]> {
     });
 
     return Array.from(walletsByNetwork.values());
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching all user wallets:", error);
     return [];
   }
@@ -675,7 +675,7 @@ export async function getTransactionHistory(
       // Ensure network is normalized
       network: normalizeNetworkName(tx.network),
     }));
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error fetching transaction history:", error);
     return [];
   }
@@ -728,7 +728,7 @@ export async function updateTransactionStatus(
 
     if (error) throw error;
     return true;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error updating transaction status:", error);
     return false;
   }
@@ -759,7 +759,7 @@ export async function getTotalBalance(userId: string): Promise<number> {
       total
     );
     return total;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error calculating total balance:", error);
     return 0;
   }
