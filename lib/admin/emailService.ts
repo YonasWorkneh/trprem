@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+import { supabase } from "../supabase";
+
 
 export interface EmailOptions {
     to: string | string[];

@@ -3,7 +3,8 @@
  * Supports both Crypto (Coinbase Commerce, NOWPayments) and Fiat (Stripe)
  */
 
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
+
 
 // ============================================
 // CONFIGURATION - Add your API keys here

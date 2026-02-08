@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+import { supabase } from "./supabase";
+
 
 export interface SupportTicket {
     id: string;
@@ -67,7 +68,7 @@ export async function createSupportTicket(
         if (messageError) throw messageError;
 
         return { success: true, ticket };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error creating support ticket:', error);
         return { success: false, error: error.message };
     }
@@ -105,7 +106,7 @@ export async function sendSupportMessage(
             .eq('id', ticketId);
 
         return { success: true, message: data };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error sending support message:', error);
         return { success: false, error: error.message };
     }
@@ -184,7 +185,7 @@ export async function getTicketMessages(ticketId: string): Promise<SupportMessag
 
         if (error) throw error;
         return data || [];
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error fetching ticket messages:', error);
         return [];
     }
@@ -205,7 +206,7 @@ export async function updateTicketStatus(
 
         if (error) throw error;
         return { success: true };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error updating ticket status:', error);
         return { success: false, error: error.message };
     }
@@ -233,7 +234,7 @@ export async function uploadSupportImage(
             .getPublicUrl(fileName);
 
         return { success: true, url: publicUrl };
-    } catch (error) {
+    } catch (error:any) {
         console.error('Error uploading support image:', error);
         return { success: false, error: error.message };
     }

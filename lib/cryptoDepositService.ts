@@ -1,6 +1,7 @@
-import { supabase } from './supabase';
+
 import type { DepositAddress, CryptoDeposit } from './depositAddresses';
 import { DEPOSIT_ADDRESSES } from './depositAddresses';
+import { supabase } from './supabase';
 
 /**
  * Generate unique deposit code
