@@ -10,6 +10,8 @@ import DepositLevelsList from "./components/home/DepositLevelsList";
 import PromoCarousel from "./components/home/PromoCarousel";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
+import ContentFilters from "./components/ContentFilters";
+import MarketTabs from "./components/home/MarketTabs";
 
 export default function Page() {
   const { isAuthenticated, user, loading: authLoading } = useAuth();
@@ -71,7 +73,7 @@ export default function Page() {
               isRefreshing={isRefreshing}
             />
             <FeatureGrid />
-            <DepositLevelsList />
+            <MarketTabs />
             <PromoCarousel />
           </>
         ) : (
