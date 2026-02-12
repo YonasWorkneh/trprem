@@ -112,6 +112,7 @@ body {
   /* Theme Backgrounds with Opacity */
   --theme-primary-bg-10: rgba(244, 208, 63, 0.1);
   --theme-primary-bg-16: rgba(244, 208, 63, 0.16);
+  --theme-primary-bg-20: rgba(244, 208, 63, 0.2);
   --theme-primary-bg-5: rgba(244, 208, 63, 0.05);
   
   /* Status Colors */
