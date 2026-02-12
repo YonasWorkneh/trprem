@@ -16,6 +16,8 @@ import { toast } from "sonner";
 import { ShieldCheck } from "lucide-react";
 import { adminLogin, getAdminSession } from "@/lib/services/adminAuthService";
 
+export const dynamic = "force-dynamic";
+
 function AdminLoginContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
