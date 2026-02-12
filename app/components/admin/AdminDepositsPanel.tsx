@@ -23,6 +23,7 @@ import {
   ExternalLink,
   RefreshCw,
 } from "lucide-react";
+import AdminEmptyState from "./AdminEmptyState";
 import { creditUserDeposit, rejectDeposit } from "@/lib/cryptoDepositService";
 import {
   Dialog,
@@ -81,7 +82,7 @@ const AdminDepositsPanel = () => {
       console.log(
         "[Admin Deposits] Query SUCCESS - found",
         data?.length || 0,
-        "deposits"
+        "deposits",
       );
       const depositsWithUsers = (data || []).map((d: CryptoDeposit) => ({
         ...d,
@@ -89,7 +90,7 @@ const AdminDepositsPanel = () => {
       }));
       console.log(
         "[Admin Deposits] Setting deposits state:",
-        depositsWithUsers
+        depositsWithUsers,
       );
       return depositsWithUsers;
     },
@@ -108,7 +109,7 @@ const AdminDepositsPanel = () => {
         () => {
           console.log("Crypto deposit change detected, refreshing...");
           refetchDeposits();
-        }
+        },
       )
       .subscribe();
 
@@ -119,7 +120,7 @@ const AdminDepositsPanel = () => {
 
   const handleStatusUpdate = async (
     deposit: CryptoDeposit,
-    action: "approve" | "reject"
+    action: "approve" | "reject",
   ) => {
     try {
       // Get admin ID (current user)
@@ -137,11 +138,11 @@ const AdminDepositsPanel = () => {
           deposit.id,
           user.id,
           1,
-          "Admin approved via panel"
+          "Admin approved via panel",
         );
         if (result.success) {
           toast.success(
-            `Deposit approved! $${deposit.amount_usd} credited to user.`
+            `Deposit approved! $${deposit.amount_usd} credited to user.`,
           );
         } else {
           throw new Error(result.error);
@@ -150,7 +151,7 @@ const AdminDepositsPanel = () => {
         const result = await rejectDeposit(
           deposit.id,
           user.id,
-          "Rejected by admin via panel"
+          "Rejected by admin via panel",
         );
         if (result.success) {
           toast.success(`Deposit rejected`);
@@ -185,7 +186,7 @@ const AdminDepositsPanel = () => {
               <Badge variant="secondary" className="ml-2">
                 {
                   deposits.filter(
-                    (d) => d.status === "pending" || d.status === "reported"
+                    (d) => d.status === "pending" || d.status === "reported",
                   ).length
                 }{" "}
                 Pending
@@ -252,7 +253,9 @@ const AdminDepositsPanel = () => {
                     </TableCell>
                     <TableCell>
                       <div className="text-sm">
-                        <span className="font-semibold">{deposit.currency}</span>
+                        <span className="font-semibold">
+                          {deposit.currency}
+                        </span>
                         {deposit.deposit_address && (
                           <div className="flex items-center gap-2 mt-1">
                             <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all max-w-[150px] truncate">
@@ -264,7 +267,7 @@ const AdminDepositsPanel = () => {
                               className="h-6 w-6"
                               onClick={() => {
                                 navigator.clipboard.writeText(
-                                  deposit.deposit_address
+                                  deposit.deposit_address,
                                 );
                                 toast.success("Address copied");
                               }}
@@ -288,7 +291,7 @@ const AdminDepositsPanel = () => {
                             className="h-6 w-6"
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                deposit.transaction_hash!
+                                deposit.transaction_hash!,
                               );
                               toast.success("TX hash copied");
                             }}
@@ -298,7 +301,9 @@ const AdminDepositsPanel = () => {
                           </Button>
                         </div>
                       ) : (
-                        <span className="text-xs text-muted-foreground">N/A</span>
+                        <span className="text-xs text-muted-foreground">
+                          N/A
+                        </span>
                       )}
                       {deposit.screenshot_url && (
                         <Button
@@ -324,14 +329,15 @@ const AdminDepositsPanel = () => {
                     </TableCell>
                     <TableCell>
                       <Badge
-                        className={`capitalize ${deposit.status === "credited" ||
-                            deposit.status === "confirmed"
+                        className={`capitalize ${
+                          deposit.status === "credited" ||
+                          deposit.status === "confirmed"
                             ? "bg-green-500/15 text-green-600 border-green-200"
                             : deposit.status === "pending" ||
-                              deposit.status === "reported"
+                                deposit.status === "reported"
                               ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
                               : "bg-red-500/15 text-red-600 border-red-200"
-                          }`}
+                        }`}
                         variant="outline"
                       >
                         {deposit.status}
@@ -340,36 +346,41 @@ const AdminDepositsPanel = () => {
                     <TableCell className="text-right pr-6">
                       {(deposit.status === "pending" ||
                         deposit.status === "reported") && (
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                              onClick={() => handleStatusUpdate(deposit, "reject")}
-                              title="Reject"
-                            >
-                              <XCircle className="w-4 h-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
-                              onClick={() => handleStatusUpdate(deposit, "approve")}
-                              title="Approve & Credit"
-                            >
-                              <CheckCircle className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                            onClick={() =>
+                              handleStatusUpdate(deposit, "reject")
+                            }
+                            title="Reject"
+                          >
+                            <XCircle className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() =>
+                              handleStatusUpdate(deposit, "approve")
+                            }
+                            title="Approve & Credit"
+                          >
+                            <CheckCircle className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}
                 {deposits.length === 0 && (
                   <TableRow>
-                    <TableCell
-                      colSpan={7}
-                      className="text-center py-8 text-muted-foreground"
-                    >
-                      No deposit requests found
+                    <TableCell colSpan={7} className="p-0">
+                      <AdminEmptyState
+                        title="No deposit requests found"
+                        description="When users make deposit requests, they will appear here for your review and approval."
+                        icon={ArrowDownCircle}
+                      />
                     </TableCell>
                   </TableRow>
                 )}
@@ -407,14 +418,15 @@ const AdminDepositsPanel = () => {
                         </div>
                       </div>
                       <Badge
-                        className={`capitalize flex-shrink-0 ${deposit.status === "credited" ||
-                            deposit.status === "confirmed"
+                        className={`capitalize flex-shrink-0 ${
+                          deposit.status === "credited" ||
+                          deposit.status === "confirmed"
                             ? "bg-green-500/15 text-green-600 border-green-200"
                             : deposit.status === "pending" ||
-                              deposit.status === "reported"
+                                deposit.status === "reported"
                               ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
                               : "bg-red-500/15 text-red-600 border-red-200"
-                          }`}
+                        }`}
                         variant="outline"
                       >
                         {deposit.status}
@@ -424,7 +436,9 @@ const AdminDepositsPanel = () => {
                     {/* Amount Section */}
                     <div className="pt-2 border-t border-border">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Amount</span>
+                        <span className="text-xs text-muted-foreground">
+                          Amount
+                        </span>
                         <div className="text-right">
                           <div className="font-mono font-bold text-foreground">
                             $
@@ -443,12 +457,18 @@ const AdminDepositsPanel = () => {
                     {/* Currency & Address Section */}
                     <div className="space-y-2 pt-2 border-t border-border">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">Currency</span>
-                        <span className="text-sm font-semibold">{deposit.currency}</span>
+                        <span className="text-xs text-muted-foreground">
+                          Currency
+                        </span>
+                        <span className="text-sm font-semibold">
+                          {deposit.currency}
+                        </span>
                       </div>
                       {deposit.deposit_address && (
                         <div className="space-y-1">
-                          <span className="text-xs text-muted-foreground">Address</span>
+                          <span className="text-xs text-muted-foreground">
+                            Address
+                          </span>
                           <div className="flex items-center gap-2">
                             <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
                               {deposit.deposit_address}
@@ -459,7 +479,7 @@ const AdminDepositsPanel = () => {
                               className="h-8 w-8 flex-shrink-0"
                               onClick={() => {
                                 navigator.clipboard.writeText(
-                                  deposit.deposit_address
+                                  deposit.deposit_address,
                                 );
                                 toast.success("Address copied");
                               }}
@@ -477,7 +497,9 @@ const AdminDepositsPanel = () => {
                       <div className="space-y-2 pt-2 border-t border-border">
                         {deposit.transaction_hash && (
                           <div className="space-y-1">
-                            <span className="text-xs text-muted-foreground">TX Hash</span>
+                            <span className="text-xs text-muted-foreground">
+                              TX Hash
+                            </span>
                             <div className="flex items-center gap-2">
                               <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
                                 {deposit.transaction_hash}
@@ -488,7 +510,7 @@ const AdminDepositsPanel = () => {
                                 className="h-8 w-8 flex-shrink-0"
                                 onClick={() => {
                                   navigator.clipboard.writeText(
-                                    deposit.transaction_hash!
+                                    deposit.transaction_hash!,
                                   );
                                   toast.success("TX hash copied");
                                 }}
@@ -504,7 +526,9 @@ const AdminDepositsPanel = () => {
                             variant="outline"
                             size="sm"
                             className="w-full text-xs flex items-center justify-center gap-2"
-                            onClick={() => setSelectedProof(deposit.screenshot_url!)}
+                            onClick={() =>
+                              setSelectedProof(deposit.screenshot_url!)
+                            }
                           >
                             <FileText className="w-4 h-4" />
                             View Proof
@@ -515,7 +539,9 @@ const AdminDepositsPanel = () => {
 
                     {/* Date Section */}
                     <div className="flex items-center justify-between pt-2 border-t border-border">
-                      <span className="text-xs text-muted-foreground">Date</span>
+                      <span className="text-xs text-muted-foreground">
+                        Date
+                      </span>
                       <div className="text-right">
                         <div className="text-sm text-muted-foreground">
                           {new Date(deposit.created_at).toLocaleDateString()}
@@ -529,26 +555,26 @@ const AdminDepositsPanel = () => {
                     {/* Action Buttons */}
                     {(deposit.status === "pending" ||
                       deposit.status === "reported") && (
-                        <div className="flex gap-2 pt-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                            onClick={() => handleStatusUpdate(deposit, "reject")}
-                          >
-                            <XCircle className="w-4 h-4 mr-2" />
-                            Reject
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() => handleStatusUpdate(deposit, "approve")}
-                          >
-                            <CheckCircle className="w-4 h-4 mr-2" />
-                            Approve
-                          </Button>
-                        </div>
-                      )}
+                      <div className="flex gap-2 pt-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                          onClick={() => handleStatusUpdate(deposit, "reject")}
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Reject
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                          onClick={() => handleStatusUpdate(deposit, "approve")}
+                        >
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Approve
+                        </Button>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               ))

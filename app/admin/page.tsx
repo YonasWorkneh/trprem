@@ -59,6 +59,7 @@ import AdminWithdrawalsPanel from "@/app/components/admin/AdminWithdrawalsPanel"
 import AdminSendsPanel from "@/app/components/admin/AdminSendsPanel";
 import AdminSettingsPanel from "@/app/components/admin/AdminSettingsPanel";
 import AdminSupportPanel from "@/app/components/admin/AdminSupportPanel";
+import AdminEmptyState from "@/app/components/admin/AdminEmptyState";
 import AdminProtectedRoute from "@/app/components/admin/AdminProtectedRoute";
 
 import { adminLogout } from "@/lib/services/adminAuthService";
@@ -542,6 +543,17 @@ function AdminDashboardContent() {
                           </TableCell>
                         </TableRow>
                       ))}
+                      {users.length === 0 && (
+                        <TableRow>
+                          <TableCell colSpan={5} className="p-0">
+                            <AdminEmptyState
+                              title="No users found"
+                              description="When users register on the platform, they will appear here for management."
+                              icon={User}
+                            />
+                          </TableCell>
+                        </TableRow>
+                      )}
                     </TableBody>
                   </Table>
                 </div>

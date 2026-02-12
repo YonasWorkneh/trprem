@@ -31,6 +31,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import AdminEmptyState from "./AdminEmptyState";
 import { useAuthStore } from "@/lib/store/authStore";
 import { uploadSupportImage } from "@/lib/supportService";
 
@@ -115,7 +116,7 @@ const AdminSupportPanel = () => {
         user.id,
         replyMessage.trim() || "", // Allow empty message if image is present
         true, // is_admin_reply
-        imageUrl
+        imageUrl,
       );
 
       if (result.success) {
@@ -144,7 +145,7 @@ const AdminSupportPanel = () => {
 
   const handleUpdateStatus = async (
     ticketId: string,
-    status: "open" | "in_progress" | "resolved" | "closed"
+    status: "open" | "in_progress" | "resolved" | "closed",
   ) => {
     const result = await updateTicketStatus(ticketId, status);
 
@@ -209,7 +210,11 @@ const AdminSupportPanel = () => {
       <CardContent>
         <Tabs
           value={filter}
-          onValueChange={(v) => setFilter(v as "open" | "in_progress" | "resolved" | "closed" | "all")}
+          onValueChange={(v) =>
+            setFilter(
+              v as "open" | "in_progress" | "resolved" | "closed" | "all",
+            )
+          }
           className="space-y-4"
         >
           <TabsList>
@@ -238,18 +243,21 @@ const AdminSupportPanel = () => {
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : filteredTickets.length === 0 ? (
-                  <div className="text-center py-12 text-muted-foreground px-4">
-                    <p>No {filter !== "all" ? filter : ""} tickets</p>
-                  </div>
+                  <AdminEmptyState
+                    title={`No ${filter !== "all" ? filter : ""} tickets found`}
+                    description="When users submit support requests, they will appear here for your response."
+                    icon={MessageCircle}
+                  />
                 ) : (
                   <div className="p-2 space-y-2">
                     {filteredTickets.map((ticket) => (
                       <div
                         key={ticket.id}
-                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedTicket?.id === ticket.id
-                          ? "bg-primary/10 border-primary"
-                          : "hover:bg-secondary/50"
-                          }`}
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                          selectedTicket?.id === ticket.id
+                            ? "bg-primary/10 border-primary"
+                            : "hover:bg-secondary/50"
+                        }`}
                         onClick={() => setSelectedTicketId(ticket.id)}
                       >
                         <div className="flex items-start justify-between mb-2">
@@ -258,7 +266,7 @@ const AdminSupportPanel = () => {
                           </h4>
                           <Badge
                             className={`${getStatusColor(
-                              ticket.status
+                              ticket.status,
                             )} ml-2 shrink-0`}
                           >
                             {getStatusIcon(ticket.status)}
@@ -351,14 +359,16 @@ const AdminSupportPanel = () => {
                       {selectedTicket.messages.map((msg) => (
                         <div
                           key={msg.id}
-                          className={`flex ${msg.is_admin_reply ? "justify-end" : "justify-start"
-                            }`}
+                          className={`flex ${
+                            msg.is_admin_reply ? "justify-end" : "justify-start"
+                          }`}
                         >
                           <div
-                            className={`max-w-[80%] rounded-lg p-3 ${msg.is_admin_reply
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-secondary"
-                              }`}
+                            className={`max-w-[80%] rounded-lg p-3 ${
+                              msg.is_admin_reply
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-secondary"
+                            }`}
                           >
                             <p className="text-sm whitespace-pre-wrap">
                               {msg.message}
@@ -445,8 +455,14 @@ const AdminSupportPanel = () => {
                       />
                       <Button
                         onClick={handleSendReply}
-                        disabled={sending || (!replyMessage.trim() && !imageFile)}
-                        title={!replyMessage.trim() && !imageFile ? "Enter a message or attach an image" : ""}
+                        disabled={
+                          sending || (!replyMessage.trim() && !imageFile)
+                        }
+                        title={
+                          !replyMessage.trim() && !imageFile
+                            ? "Enter a message or attach an image"
+                            : ""
+                        }
                       >
                         {sending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />

@@ -21,6 +21,7 @@ import {
   Copy,
   RefreshCw,
 } from "lucide-react";
+import AdminEmptyState from "./AdminEmptyState";
 import {
   approveWithdrawal,
   rejectWithdrawal,
@@ -85,7 +86,7 @@ const AdminWithdrawalsPanel = () => {
         (payload) => {
           console.log("New withdrawal received:", payload);
           refetchWithdrawals();
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -93,7 +94,7 @@ const AdminWithdrawalsPanel = () => {
         (payload) => {
           console.log("Withdrawal updated:", payload);
           refetchWithdrawals();
-        }
+        },
       )
       .on(
         "postgres_changes",
@@ -101,7 +102,7 @@ const AdminWithdrawalsPanel = () => {
         (payload) => {
           console.log("Withdrawal deleted:", payload);
           refetchWithdrawals();
-        }
+        },
       )
       .subscribe((status) => {
         console.log("Withdrawals realtime status:", status);
@@ -117,7 +118,7 @@ const AdminWithdrawalsPanel = () => {
     status: "approved" | "rejected" | "completed",
     amount: number,
     userId: string,
-    network: string
+    network: string,
   ) => {
     try {
       if (status === "approved" || status === "completed") {
@@ -215,7 +216,9 @@ const AdminWithdrawalsPanel = () => {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      <span className="font-semibold">{withdrawal.network}</span>
+                      <span className="font-semibold">
+                        {withdrawal.network}
+                      </span>
                       <div className="flex items-center gap-2 mt-1">
                         <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all">
                           {withdrawal.address}
@@ -242,12 +245,14 @@ const AdminWithdrawalsPanel = () => {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      className={`capitalize ${withdrawal.status === "completed" || withdrawal.status === "approved"
+                      className={`capitalize ${
+                        withdrawal.status === "completed" ||
+                        withdrawal.status === "approved"
                           ? "bg-green-500/15 text-green-600 border-green-200"
                           : withdrawal.status === "pending"
                             ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
                             : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
+                      }`}
                       variant="outline"
                     >
                       {withdrawal.status}
@@ -266,7 +271,7 @@ const AdminWithdrawalsPanel = () => {
                               "rejected",
                               withdrawal.amount,
                               withdrawal.user_id,
-                              withdrawal.network
+                              withdrawal.network,
                             )
                           }
                           title="Reject"
@@ -282,7 +287,7 @@ const AdminWithdrawalsPanel = () => {
                               "completed",
                               withdrawal.amount,
                               withdrawal.user_id,
-                              withdrawal.network
+                              withdrawal.network,
                             )
                           }
                           title="Approve"
@@ -296,11 +301,12 @@ const AdminWithdrawalsPanel = () => {
               ))}
               {withdrawals.length === 0 && (
                 <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center py-8 text-muted-foreground"
-                  >
-                    No withdrawal requests found
+                  <TableCell colSpan={6} className="p-0">
+                    <AdminEmptyState
+                      title="No withdrawal requests found"
+                      description="When users request withdrawals, they will appear here for your review and approval."
+                      icon={ArrowUpFromLine}
+                    />
                   </TableCell>
                 </TableRow>
               )}
@@ -315,7 +321,9 @@ const AdminWithdrawalsPanel = () => {
               <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
                 <ArrowUpFromLine className="w-8 h-8 opacity-20" />
               </div>
-              <p className="text-lg font-medium">No withdrawal requests found</p>
+              <p className="text-lg font-medium">
+                No withdrawal requests found
+              </p>
             </div>
           ) : (
             withdrawals.map((withdrawal) => (
@@ -335,13 +343,14 @@ const AdminWithdrawalsPanel = () => {
                       </div>
                     </div>
                     <Badge
-                      className={`capitalize flex-shrink-0 ${withdrawal.status === "completed" ||
-                          withdrawal.status === "approved"
+                      className={`capitalize flex-shrink-0 ${
+                        withdrawal.status === "completed" ||
+                        withdrawal.status === "approved"
                           ? "bg-green-500/15 text-green-600 border-green-200"
                           : withdrawal.status === "pending"
                             ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
                             : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
+                      }`}
                       variant="outline"
                     >
                       {withdrawal.status}
@@ -351,7 +360,9 @@ const AdminWithdrawalsPanel = () => {
                   {/* Amount Section */}
                   <div className="pt-2 border-t border-border">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Amount</span>
+                      <span className="text-xs text-muted-foreground">
+                        Amount
+                      </span>
                       <div className="text-right">
                         <div className="font-mono font-bold text-foreground">
                           ${withdrawal.amount?.toFixed(2)}
@@ -374,11 +385,17 @@ const AdminWithdrawalsPanel = () => {
                   {/* Network & Address Section */}
                   <div className="space-y-2 pt-2 border-t border-border">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Network</span>
-                      <span className="text-sm font-semibold">{withdrawal.network}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Network
+                      </span>
+                      <span className="text-sm font-semibold">
+                        {withdrawal.network}
+                      </span>
                     </div>
                     <div className="space-y-1">
-                      <span className="text-xs text-muted-foreground">Address</span>
+                      <span className="text-xs text-muted-foreground">
+                        Address
+                      </span>
                       <div className="flex items-center gap-2">
                         <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
                           {withdrawal.address}
@@ -420,7 +437,7 @@ const AdminWithdrawalsPanel = () => {
                             "rejected",
                             withdrawal.amount,
                             withdrawal.user_id,
-                            withdrawal.network
+                            withdrawal.network,
                           )
                         }
                       >
@@ -436,7 +453,7 @@ const AdminWithdrawalsPanel = () => {
                             "completed",
                             withdrawal.amount,
                             withdrawal.user_id,
-                            withdrawal.network
+                            withdrawal.network,
                           )
                         }
                       >
