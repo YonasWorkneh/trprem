@@ -1,16 +1,12 @@
 "use client";
 
 import { supabase } from "../supabase";
-import type {
-  RegisterCredentials,
-  AuthResult,
-  Profile,
-} from "../types/auth";
+import type { RegisterCredentials, AuthResult, Profile } from "../types/auth";
 import { setStoredAuth } from "../utils/authStorage";
 
 export async function loginWithEmail(
   email: string,
-  password: string
+  password: string,
 ): Promise<AuthResult> {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -40,7 +36,7 @@ export async function loginWithEmail(
         email: data.user.email || undefined,
         phone: data.user.phone || undefined,
       },
-      null
+      null,
     );
 
     return {
@@ -64,7 +60,7 @@ export async function loginWithEmail(
 
 export async function loginWithPhone(
   phone: string,
-  password: string
+  password: string,
 ): Promise<AuthResult> {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -94,7 +90,7 @@ export async function loginWithPhone(
         email: data.user.email || undefined,
         phone: data.user.phone || undefined,
       },
-      null
+      null,
     );
 
     return {
@@ -117,7 +113,7 @@ export async function loginWithPhone(
 }
 
 export async function registerWithEmail(
-  credentials: RegisterCredentials
+  credentials: RegisterCredentials,
 ): Promise<AuthResult> {
   try {
     if (credentials.password !== credentials.confirmPassword) {
@@ -142,7 +138,7 @@ export async function registerWithEmail(
           name: credentials.fullName,
           phone: credentials.phone || null,
         },
-        emailRedirectTo:"https://trprem.vercel.app"
+        emailRedirectTo: "https://trprem.vercel.app",
       },
     });
 
@@ -167,9 +163,7 @@ export async function registerWithEmail(
           id: data.user.id,
           email: data.user.email || undefined,
         },
-        
       },
-
     };
   } catch (error) {
     return {
@@ -181,7 +175,7 @@ export async function registerWithEmail(
 }
 
 export async function registerWithPhone(
-  credentials: RegisterCredentials
+  credentials: RegisterCredentials,
 ): Promise<AuthResult> {
   try {
     if (credentials.password !== credentials.confirmPassword) {
@@ -242,7 +236,7 @@ export async function registerWithPhone(
 }
 
 export async function resendConfirmationEmail(
-  email: string
+  email: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const { error } = await supabase.auth.resend({
@@ -282,6 +276,7 @@ export async function logout(): Promise<{ success: boolean; error?: string }> {
     }
 
     if (error) {
+      console.error("Logout error:", error);
       return {
         success: false,
         error: error.message,

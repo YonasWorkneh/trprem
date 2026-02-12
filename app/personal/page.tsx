@@ -168,7 +168,6 @@ export default function PersonalPage() {
   };
 
   const handleLogout = async () => {
-    console.log("logging out");
     const result = await logout();
     if (result.success) {
       toast.success("Logged out successfully");
@@ -206,11 +205,10 @@ export default function PersonalPage() {
         <Header title="trade prememium" />
         <main className="flex-1 pb-20 px-4 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-gray-500 mb-4">Please log in to view your profile</p>
-            <Link
-              href="/login"
-              className="text-[#F4D03F] hover:underline"
-            >
+            <p className="text-gray-500 mb-4">
+              Please log in to view your profile
+            </p>
+            <Link href="/login" className="text-[#F4D03F] hover:underline">
               Go to Login
             </Link>
           </div>

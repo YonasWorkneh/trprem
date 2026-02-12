@@ -79,7 +79,7 @@ export default function Page() {
         ) : (
           <>
             <HeroSection />
-            <DepositLevelsList />
+            <MarketTabs />
           </>
         )}
       </main>
