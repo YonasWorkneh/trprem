@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,28 +23,27 @@ function AdminLoginContent() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isCheckingSession, setIsCheckingSession] = useState(true);
+
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Check for existing admin session on mount
   useEffect(() => {
-    const checkExistingSession = () => {
-      const adminSession = getAdminSession();
-      if (adminSession) {
-        // Valid admin session exists, redirect to dashboard
-        const from = searchParams.get("from") || "/admin";
-        router.replace(from);
-        return;
-      }
-      setIsCheckingSession(false);
-    };
+    // ✅ ensure this runs only in browser
+    if (typeof window === "undefined") return;
 
-    checkExistingSession();
+    const adminSession = getAdminSession();
+
+    if (adminSession) {
+      const from = searchParams.get("from") || "/admin";
+      router.replace(from);
+      return;
+    }
+
+    setIsCheckingSession(false);
   }, [router, searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     setIsLoading(true);
 
     try {
@@ -54,12 +53,15 @@ function AdminLoginContent() {
         toast.success("Admin access granted");
         router.push("/admin");
         return;
-      } else if (result.isAdmin === false) {
-        toast.error("Access denied. Admin privileges required.");
-      } else {
-        toast.error(result.error || "Login failed");
       }
-    } catch (error: unknown) {
+
+      if (result.isAdmin === false) {
+        toast.error("Access denied. Admin privileges required.");
+        return;
+      }
+
+      toast.error(result.error || "Login failed");
+    } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed");
     } finally {
@@ -101,9 +103,9 @@ function AdminLoginContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="bg-secondary/50 border-input"
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -112,9 +114,9 @@ function AdminLoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-secondary/50 border-input"
               />
             </div>
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Verifying..." : "Access Dashboard"}
             </Button>
@@ -126,5 +128,15 @@ function AdminLoginContent() {
 }
 
 export default function AdminLoginPage() {
-  return <AdminLoginContent />;
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
+      <AdminLoginContent />
+    </Suspense>
+  );
 }
