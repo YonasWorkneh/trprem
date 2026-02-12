@@ -250,8 +250,8 @@ export default function PersonalPage() {
             <ProfileItem
               icon={<FileTextIcon />}
               title="KYC Verification"
-              description="Identity verification status"
-              href="/person/kyc"
+              description="Identity verification statusss"
+              href="/personal/kyc"
               badge={
                 profile?.kyc_status === "verified"
                   ? "Verified"

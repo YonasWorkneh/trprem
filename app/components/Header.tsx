@@ -4,18 +4,34 @@ import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/lib/hooks/useAuth";
 import UserMenu from "./UserMenu";
+import { ArrowLeft } from "lucide-react";
 
 interface HeaderProps {
   title: string;
+  showBackButton?: boolean;
+  onBackClick?: () => void;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({
+  title,
+  showBackButton,
+  onBackClick,
+}: HeaderProps) {
   const { isAuthenticated, loading } = useAuth();
 
   return (
     <header className="w-full px-4 py-4">
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-3">
+          {showBackButton && (
+            <button
+              onClick={onBackClick}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="w-5 h-5 text-gray-700" />
+            </button>
+          )}
           <Link href="/" className="rounded-full bg-gray-700 p-2 block">
             <Image
               src="/favicon.png"
