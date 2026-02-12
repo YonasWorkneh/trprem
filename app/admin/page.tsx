@@ -430,7 +430,7 @@ function AdminDashboardContent() {
                   </Badge>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[280px]" {...({} as any)}>
+              <SheetContent side="left" className="w-[280px]">
                 <div className="flex flex-col h-full">
                   <SheetHeader>
                     <SheetTitle>Admin Menu</SheetTitle>
