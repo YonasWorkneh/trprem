@@ -10,11 +10,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import {
+  createSupportTicket,
+  CreateTicketData,
+} from "@/lib/services/supportService";
 
 interface CreateTicketModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   onSuccess?: () => void;
+  userId: string;
 }
 
 const categories = [
@@ -28,7 +33,7 @@ const categories = [
 
 const priorities = [
   { value: "low", label: "Low - Question" },
-  { value: "medium", label: "Medium - Issue" },
+  { value: "normal", label: "Medium - Issue" },
   { value: "high", label: "High - Urgent" },
 ];
 
@@ -36,9 +41,10 @@ export default function CreateTicketModal({
   isOpen,
   onClose,
   onSuccess,
+  userId,
 }: CreateTicketModalProps) {
   const [category, setCategory] = useState("");
-  const [priority, setPriority] = useState("medium");
+  const [priority, setPriority] = useState("normal");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,19 +64,31 @@ export default function CreateTicketModal({
     }
 
     setIsSubmitting(true);
-    // TODO: Submit ticket via API
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success("Support ticket created successfully");
-      // Reset form
-      setCategory("");
-      setPriority("medium");
-      setSubject("");
-      setMessage("");
-      onClose();
-      onSuccess?.();
+      const ticketData: CreateTicketData = {
+        subject: `${category}: ${subject}`,
+        message,
+        priority: priority as "low" | "normal" | "high",
+        page_context: category,
+      };
+
+      const result = await createSupportTicket(userId, ticketData);
+
+      if (result.success) {
+        toast.success("Support ticket created successfully!");
+        // Reset form
+        setCategory("");
+        setPriority("normal");
+        setSubject("");
+        setMessage("");
+        onClose?.();
+        onSuccess?.();
+      } else {
+        toast.error(result.error || "Failed to create support ticket");
+      }
     } catch (error) {
-      toast.error("Failed to create ticket. Please try again.");
+      console.error("Create ticket error:", error);
+      toast.error("Failed to create support ticket");
     } finally {
       setIsSubmitting(false);
     }
@@ -78,10 +96,10 @@ export default function CreateTicketModal({
 
   const handleCancel = () => {
     setCategory("");
-    setPriority("medium");
+    setPriority("normal");
     setSubject("");
     setMessage("");
-    onClose();
+    onClose?.();
   };
 
   if (!isOpen) return null;
@@ -89,10 +107,7 @@ export default function CreateTicketModal({
   return (
     <>
       {/* Overlay */}
-      <div
-        className="fixed inset-0 bg-black/50 z-50"
-        onClick={handleCancel}
-      />
+      <div className="fixed inset-0 bg-black/50 z-50" onClick={handleCancel} />
 
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -117,7 +132,8 @@ export default function CreateTicketModal({
           {/* Content */}
           <div className="p-6 space-y-6">
             <p className="text-sm text-gray-600">
-              Describe your issue and we&apos;ll get back to you as soon as possible.
+              Describe your issue and we&apos;ll get back to you as soon as
+              possible.
             </p>
 
             {/* Category */}
