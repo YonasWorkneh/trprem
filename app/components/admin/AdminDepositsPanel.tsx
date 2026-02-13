@@ -31,6 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import Image from "next/image";
 
 interface CryptoDeposit {
   id: string;
@@ -593,10 +594,12 @@ const AdminDepositsPanel = () => {
           </DialogHeader>
           {selectedProof && (
             <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-black/5">
-              <img
+              <Image
                 src={selectedProof}
                 alt="Proof of Payment"
                 className="object-contain w-full h-full"
+                width={1200}
+                height={800}
               />
               <div className="absolute top-2 right-2">
                 <Button

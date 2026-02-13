@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { toast } from "sonner";
 
 // Import logos
@@ -19,6 +19,10 @@ import BottomNavigation from "@/app/components/BottomNavigation";
 import { ArrowLeft, Copy, Upload, CircleCheck } from "lucide-react";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
+import {
+  createDepositRequest,
+  uploadDepositProof,
+} from "@/lib/services/depositService";
 import UploadProofModal from "@/app/components/deposit/UploadProofModal";
 import {
   Select,
@@ -160,6 +164,8 @@ function DepositContent() {
   const [copied, setCopied] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadedProof, setUploadedProof] = useState<File | null>(null);
+  const [uploadedProofUrl, setUploadedProofUrl] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Mock wallet addresses - in production, fetch from API
@@ -251,12 +257,25 @@ function DepositContent() {
     setIsUploadModalOpen(true);
   };
 
-  const handleProofUploadComplete = (file: File) => {
+  const handleProofUploadComplete = async (file: File) => {
     setUploadedProof(file);
-    toast.success("Payment proof uploaded successfully");
+
+    // Upload proof to Supabase storage
+    const uploadResult = await uploadDepositProof(file);
+    if (uploadResult.success && uploadResult.url) {
+      setUploadedProofUrl(uploadResult.url);
+      toast.success("Payment proof uploaded successfully");
+    } else {
+      toast.error(uploadResult.error || "Failed to upload payment proof");
+    }
   };
 
-  const handleSubmitDeposit = () => {
+  const handleSubmitDeposit = async () => {
+    if (!user) {
+      toast.error("You must be logged in to submit a deposit");
+      return;
+    }
+
     if (level) {
       if (estimatedUSDT < level.minUsd) {
         toast.error(
@@ -271,8 +290,46 @@ function DepositContent() {
         return;
       }
     }
-    // TODO: Implement deposit submission
-    toast.info("Deposit request submission coming soon");
+
+    if (!uploadedProof) {
+      toast.error("Please upload payment proof before submitting");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const result = await createDepositRequest(user.id, {
+        currency: selectedCurrency,
+        deposit_address: walletAddress,
+        amount: parseFloat(depositAmount),
+        amount_usd: estimatedUSDT,
+        screenshot_url: uploadedProofUrl || undefined,
+        notes: level
+          ? `${level.name} deposit - ${level.returnRate}% return`
+          : "Standard deposit",
+      });
+
+      if (result.success) {
+        toast.success(
+          `Deposit request submitted successfully! Reference: ${result.data?.deposit_code}`,
+        );
+        // Reset form
+        setDepositAmount("10.00");
+        setUploadedProof(null);
+        setUploadedProofUrl(null);
+        // Redirect to personal page after successful submission
+        setTimeout(() => {
+          router.push("/personal");
+        }, 2000);
+      } else {
+        toast.error(result.error || "Failed to submit deposit request");
+      }
+    } catch (error) {
+      console.error("Deposit submission error:", error);
+      toast.error("Failed to submit deposit request");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isAuthenticated) {
@@ -295,7 +352,7 @@ function DepositContent() {
     USDT: 10,
   };
 
-  const coinLogos: Record<string, any> = {
+  const coinLogos: Record<string, StaticImageData> = {
     ETH: ethLogo,
     BTC: btcLogo,
     USDT: usdtLogo,
@@ -505,10 +562,11 @@ function DepositContent() {
                     />
                     <button
                       onClick={handleCopyAddress}
-                      className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${copied
-                        ? "bg-green-600 text-white"
-                        : "bg-[var(--theme-primary)] text-[var(--theme-primary-text)] hover:bg-[var(--theme-primary-hover)]"
-                        }`}
+                      className={`p-3 rounded-xl transition-colors cursor-pointer flex items-center justify-center ${
+                        copied
+                          ? "bg-green-600 text-white"
+                          : "bg-[var(--theme-primary)] text-[var(--theme-primary-text)] hover:bg-[var(--theme-primary-hover)]"
+                      }`}
                       aria-label="Copy address"
                     >
                       {copied ? (
@@ -572,6 +630,7 @@ function DepositContent() {
                 <button
                   onClick={handleSubmitDeposit}
                   disabled={
+                    isSubmitting ||
                     !uploadedProof ||
                     (!!level &&
                       (estimatedUSDT < level.minUsd ||
@@ -579,7 +638,14 @@ function DepositContent() {
                   }
                   className="w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-4 rounded-xl font-medium hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
-                  Submit Deposit Request
+                  {isSubmitting ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Submitting...</span>
+                    </div>
+                  ) : (
+                    "Submit Deposit Request"
+                  )}
                 </button>
               </div>
             </div>
@@ -599,15 +665,17 @@ function DepositContent() {
 
 export default function DepositPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header title="trade prememium" />
-        <main className="flex-1 pb-20 px-4 flex items-center justify-center">
-          <div className="animate-pulse text-gray-500">Loading...</div>
-        </main>
-        <BottomNavigation />
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex flex-col bg-white">
+          <Header title="trade prememium" />
+          <main className="flex-1 pb-20 px-4 flex items-center justify-center">
+            <div className="animate-pulse text-gray-500">Loading...</div>
+          </main>
+          <BottomNavigation />
+        </div>
+      }
+    >
       <DepositContent />
     </Suspense>
   );
