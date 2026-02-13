@@ -699,7 +699,7 @@ function AdminDashboardContent() {
 
                         <div className="flex gap-4">
                           <Button
-                            className="flex-1 bg-green-600 hover:bg-green-700"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                             onClick={() =>
                               selectedUser?.id &&
                               updateKycStatus(selectedUser.id, "verified")
@@ -709,7 +709,7 @@ function AdminDashboardContent() {
                           </Button>
                           <Button
                             variant="destructive"
-                            className="flex-1"
+                            className="flex-1 text-white"
                             onClick={() =>
                               selectedUser?.id &&
                               updateKycStatus(selectedUser.id, "rejected")

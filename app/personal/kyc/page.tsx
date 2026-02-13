@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,12 @@ import {
 import { toast } from "sonner";
 import Header from "@/app/components/Header";
 import BottomNavigation from "@/app/components/BottomNavigation";
+import { useAuth } from "@/lib/hooks/useAuth";
+import {
+  submitKycSubmission,
+  getKycSubmission,
+} from "@/lib/services/kycService";
+import type { KycSubmission } from "@/lib/types/kyc";
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,6 +31,8 @@ import {
   MapPin,
   Shield,
   CheckCircle,
+  Clock,
+  AlertCircle,
 } from "lucide-react";
 
 interface KYCData {
@@ -60,8 +68,13 @@ const steps = [
 
 export default function KYCPage() {
   const router = useRouter();
+  const { user, profile } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [kycStatus, setKycStatus] = useState<string | null>(null);
+  const [kycDetails, setKycDetails] = useState<KycSubmission | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasChecked, setHasChecked] = useState(false);
   const [kycData, setKycData] = useState<KYCData>({
     personal: {
       fullName: "",
@@ -85,6 +98,153 @@ export default function KYCPage() {
       selfieImage: null,
     },
   });
+
+  useEffect(() => {
+    const checkKycStatus = async () => {
+      if (!user || hasChecked) return;
+
+      setIsLoading(true);
+      setHasChecked(true);
+
+      const result = await getKycSubmission(user.id);
+
+      if (result.success && result.data) {
+        setKycStatus(result.data.status);
+        setKycDetails(result.data);
+      } else if (profile?.kyc_status) {
+        setKycStatus(profile.kyc_status);
+      }
+      setIsLoading(false);
+    };
+
+    checkKycStatus();
+  }, [user, profile, hasChecked]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header title="KYC Verification" />
+        <main className="flex-1 pb-20 px-4 pt-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F4D03F]"></div>
+            </div>
+          </div>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  if (kycStatus === "verified") {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header title="KYC Verification" />
+        <main className="flex-1 pb-20 px-4 pt-6 h-full flex items-center justify-center">
+          <div className="max-w-2xl mx-auto">
+            <Card className="mb-6 bg-transparent shadow-none">
+              <CardContent className="p-8 text-center">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-green-700 mb-2">
+                  KYC Verified
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Your identity has been successfully verified. You now have
+                  full access to all platform features.
+                </p>
+                <Button
+                  onClick={() => router.push("/personal")}
+                  className="bg-[#F4D03F] hover:bg-[#E4C02F] cursor-pointer"
+                >
+                  Back to Profile
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  if (kycStatus === "pending") {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header title="KYC Verification" />
+        <main className="flex-1 pb-20 px-4 pt-6 h-full flex items-center justify-center">
+          <div className="max-w-2xl mx-auto">
+            <Card className="mb-6 bg-transparent shadow-none">
+              <CardContent className="p-8 text-center">
+                <Clock className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-yellow-700 mb-2">
+                  KYC Under Review
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Your KYC application is currently being reviewed by our team.
+                  This typically takes 1-3 business days.
+                </p>
+                {kycDetails && (
+                  <div className="text-left bg-gray-50 p-4 rounded-lg mb-6">
+                    <h3 className="font-semibold mb-2">Submitted Details:</h3>
+                    <p>
+                      <strong>Name:</strong> {kycDetails.full_name}
+                    </p>
+                    <p>
+                      <strong>ID Type:</strong>{" "}
+                      {kycDetails.id_type?.replace("_", " ")}
+                    </p>
+                    <p>
+                      <strong>Submitted:</strong>{" "}
+                      {new Date(kycDetails.submitted_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+                <Button
+                  onClick={() => router.push("/personal")}
+                  className="bg-[#F4D03F] hover:bg-[#E4C02F] cursor-pointer"
+                >
+                  Back to Profile
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
+  if (kycStatus === "rejected") {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header title="KYC Verification" />
+        <main className="flex-1 pb-20 px-4 pt-6">
+          <div className="max-w-2xl mx-auto">
+            <Card className="mb-6">
+              <CardContent className="p-8 text-center">
+                <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-red-700 mb-2">
+                  KYC Rejected
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Your KYC application was not approved.{" "}
+                  {kycDetails?.rejection_reason &&
+                    `Reason: ${kycDetails.rejection_reason}`}
+                </p>
+                <Button
+                  onClick={() => router.push("/personal")}
+                  className="bg-[#F4D03F] hover:bg-[#E4C02F]"
+                >
+                  Back to Profile
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+        <BottomNavigation />
+      </div>
+    );
+  }
 
   const validateCurrentStep = () => {
     switch (currentStep) {
@@ -134,12 +294,23 @@ export default function KYCPage() {
   };
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast.error("You must be logged in to submit KYC");
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      // TODO: Submit KYC data to backend
-      toast.success("KYC verification submitted successfully");
-      router.push("/personal");
+      const result = await submitKycSubmission(user.id, kycData);
+
+      if (result.success) {
+        toast.success("KYC verification submitted successfully");
+        router.push("/personal");
+      } else {
+        toast.error(result.error || "Failed to submit KYC verification");
+      }
     } catch (error) {
+      console.error("KYC submission error:", error);
       toast.error("Failed to submit KYC verification");
     } finally {
       setIsSubmitting(false);
@@ -549,9 +720,13 @@ export default function KYCPage() {
               disabled={!validateCurrentStep() || isSubmitting}
               className="bg-[#F4D03F] hover:bg-[#E4C02F] text-white flex items-center space-x-2"
             >
-              <span>
-                {currentStep === steps.length - 1 ? "Submit" : "Next"}
-              </span>
+              {isSubmitting ? (
+                <span>Submitting...</span>
+              ) : (
+                <span>
+                  {currentStep === steps.length - 1 ? "Submit" : "Next"}
+                </span>
+              )}
               {currentStep < steps.length - 1 && (
                 <ChevronRight className="w-4 h-4" />
               )}
