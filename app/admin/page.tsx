@@ -59,6 +59,7 @@ import AdminWithdrawalsPanel from "@/app/components/admin/AdminWithdrawalsPanel"
 import AdminSendsPanel from "@/app/components/admin/AdminSendsPanel";
 import AdminSettingsPanel from "@/app/components/admin/AdminSettingsPanel";
 import AdminSupportPanel from "@/app/components/admin/AdminSupportPanel";
+import { getUsersForAdmin } from "@/lib/services/adminUserService";
 import AdminEmptyState from "@/app/components/admin/AdminEmptyState";
 import AdminProtectedRoute from "@/app/components/admin/AdminProtectedRoute";
 
@@ -67,11 +68,15 @@ import { adminLogout } from "@/lib/services/adminAuthService";
 interface UserData {
   id: string;
   email: string;
-  name: string;
-  created_at: string;
-  kyc_status: "not_started" | "pending" | "verified" | "rejected";
+  name: string | null;
   avatar_url: string | null;
+  phone: string | null;
+  kyc_status: "not_started" | "pending" | "verified" | "rejected";
   role: "user" | "admin";
+  trading_balance: number;
+  preferences: Record<string, unknown>;
+  created_at: string;
+  updated_at: string;
 }
 
 interface KycSubmission {
@@ -114,16 +119,14 @@ function AdminDashboardContent() {
   } = useQuery<UserData[]>({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const result = await getUsersForAdmin();
 
-      if (error) {
-        toast.error("Failed to fetch users: " + error.message);
-        throw error;
+      if (!result.success) {
+        toast.error("Failed to fetch users: " + result.error);
+        throw new Error(result.error);
       }
-      return (data || []) as UserData[];
+
+      return result.data || [];
     },
     enabled: true,
     staleTime: 1000 * 5,
