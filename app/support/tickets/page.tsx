@@ -31,7 +31,7 @@ export default function SupportTicketsPage() {
     null,
   );
 
-  const { tickets, isLoading, error, refetch } = useSupportTickets({
+  const { tickets, isLoading, error, refetch, isFetching } = useSupportTickets({
     userId: user?.id,
     filter: activeFilter,
     enabled: !!user?.id,
@@ -81,13 +81,26 @@ export default function SupportTicketsPage() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={handleCreateTicket}
-              className="bg-[var(--theme-primary)] text-[var(--theme-primary-text)] px-6 py-3 rounded-xl font-semibold hover:bg-[var(--theme-primary-hover)] transition-colors cursor-pointer flex items-center gap-2"
-            >
-              <Plus className="w-5 h-5" />
-              <span>New Ticket</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => refetch()}
+                disabled={isFetching}
+                className="p-3 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                aria-label="Refresh tickets"
+                title="Refresh tickets"
+              >
+                <RefreshCw
+                  className={`w-5 h-5 ${isFetching ? "animate-spin" : ""}`}
+                />
+              </button>
+              <button
+                onClick={handleCreateTicket}
+                className="bg-[var(--theme-primary)] text-[var(--theme-primary-text)] px-6 py-3 rounded-xl font-semibold hover:bg-[var(--theme-primary-hover)] transition-colors cursor-pointer flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span>New Ticket</span>
+              </button>
+            </div>
           </div>
 
           {/* Filter Tabs */}
