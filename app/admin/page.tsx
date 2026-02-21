@@ -6,7 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import {
   Table,
@@ -83,19 +89,40 @@ interface KycSubmission {
   id: string;
   user_id: string;
   full_name: string;
-  date_of_birth: string;
-  nationality: string;
-  address_line: string;
-  city: string;
-  zip_code: string;
-  country: string;
-  id_type: string;
-  id_number: string;
+  date_of_birth: string | null;
+  nationality: string | null;
+  address_line: string | null;
+  city: string | null;
+  zip_code: string | null;
+  country: string | null;
+  id_type: string | null;
+  id_number: string | null;
   id_front_url: string;
-  id_back_url: string;
+  id_back_url: string | null;
   selfie_url: string;
   status: string;
+  rejection_reason: string | null;
+  reviewed_at: string | null;
   submitted_at: string;
+}
+
+interface UsdtWalletRow {
+  id: string;
+  balance: number;
+  address?: string;
+  network?: string;
+}
+
+interface UserDetailsRpc {
+  profile?: { trading_balance?: number };
+  balances?: UsdtWalletRow[] | null;
+  stats?: unknown;
+}
+
+interface OtherCoinBalance {
+  currency: string;
+  amount: number;
+  amount_usd: number;
 }
 
 function AdminDashboardContent() {
@@ -104,6 +131,9 @@ function AdminDashboardContent() {
     string,
     unknown
   > | null>(null);
+  const [totalUsdtBalance, setTotalUsdtBalance] = useState<number>(0);
+  const [tradingBalance, setTradingBalance] = useState<number>(0);
+  const [otherCoins, setOtherCoins] = useState<OtherCoinBalance[]>([]);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [adjustAmount, setAdjustAmount] = useState("");
   const [adjustType, setAdjustType] = useState<"credit" | "debit">("credit");
@@ -194,9 +224,69 @@ function AdminDashboardContent() {
         target_user_id: userId,
       });
       if (error) throw error;
+      const rpcData = data as UserDetailsRpc | null;
       setUserDetails(data as Record<string, unknown>);
+
+      // Total USDT from usdt_wallets
+      const wallets = (rpcData?.balances ?? []) as UsdtWalletRow[];
+      const totalUsdt = Array.isArray(wallets)
+        ? wallets.reduce((sum, w) => sum + Number(w.balance ?? 0), 0)
+        : 0;
+      setTotalUsdtBalance(totalUsdt);
+
+      // Trading balance from users.trading_balance (profile)
+      const trading =
+        rpcData?.profile?.trading_balance ?? selectedUser?.trading_balance ?? 0;
+      setTradingBalance(Number(trading));
+
+      // Other coins from crypto_deposits (credited/confirmed), summed by currency with amount_usd
+      const { data: deposits, error: depositsError } = await supabase
+        .from("crypto_deposits")
+        .select("currency, admin_verified_amount, amount, amount_usd")
+        .eq("user_id", userId)
+        .in("status", ["credited", "confirmed"]);
+
+      if (depositsError) {
+        console.warn("Error fetching crypto_deposits for balance:", depositsError);
+        setOtherCoins([]);
+        return;
+      }
+
+      const byCurrency = new Map<
+        string,
+        { amount: number; amount_usd: number }
+      >();
+      for (const row of deposits ?? []) {
+        const amount = Number(
+          row.admin_verified_amount ?? row.amount ?? 0,
+        ) as number;
+        const amountUsd = Number(row.amount_usd ?? 0) as number;
+        if (amount <= 0 && amountUsd <= 0) continue;
+        const cur = (row.currency ?? "OTHER").toUpperCase();
+        const existing = byCurrency.get(cur) ?? {
+          amount: 0,
+          amount_usd: 0,
+        };
+        byCurrency.set(cur, {
+          amount: existing.amount + amount,
+          amount_usd: existing.amount_usd + amountUsd,
+        });
+      }
+      setOtherCoins(
+        Array.from(byCurrency.entries())
+          .map(([currency, { amount, amount_usd }]) => ({
+            currency,
+            amount,
+            amount_usd,
+          }))
+          .filter((c) => c.currency !== "USDT")
+          .sort((a, b) => a.currency.localeCompare(b.currency)),
+      );
     } catch (error: unknown) {
       console.error("Error fetching full user details:", error);
+      setTotalUsdtBalance(0);
+      setTradingBalance(0);
+      setOtherCoins([]);
     }
   };
 
@@ -582,7 +672,17 @@ function AdminDashboardContent() {
         </Tabs>
 
         {/* User Details Dialog */}
-        <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
+        <Dialog
+          open={isDetailsOpen}
+          onOpenChange={(open) => {
+            setIsDetailsOpen(open);
+            if (!open) {
+              setTotalUsdtBalance(0);
+              setTradingBalance(0);
+              setOtherCoins([]);
+            }
+          }}
+        >
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>User Details: {selectedUser?.name}</DialogTitle>
@@ -610,14 +710,58 @@ function AdminDashboardContent() {
                     <span className="text-muted-foreground">Email</span>
                     <span>{selectedUser?.email}</span>
                   </div>
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="text-muted-foreground">Balance</span>
-                    <span className="font-bold text-primary">
-                      $
-                      {typeof userDetails?.total_balance === "number"
-                        ? userDetails.total_balance.toFixed(2)
-                        : "0.00"}
-                    </span>
+                  <div className="border-t pt-4 mt-4 space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">
+                        Total USDT balance
+                      </span>
+                      <span className="font-bold text-primary">
+                        ${totalUsdtBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">
+                        Trading balance
+                      </span>
+                      <span className="font-semibold">
+                        ${tradingBalance.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                      </span>
+                    </div>
+                    {otherCoins.length > 0 && (
+                      <div className="pt-2">
+                        <span className="text-muted-foreground text-sm block mb-2">
+                          Other coins (from crypto deposits)
+                        </span>
+                        <ul className="space-y-1.5 text-sm">
+                          {otherCoins.map(
+                            ({ currency, amount, amount_usd }) => (
+                              <li
+                                key={currency}
+                                className="flex justify-between items-center gap-4"
+                              >
+                                <span className="text-muted-foreground">
+                                  {currency}
+                                </span>
+                                <span className="font-medium text-right">
+                                  {amount.toLocaleString("en-US", {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 8,
+                                  })}{" "}
+                                  <span className="text-muted-foreground font-normal">
+                                    (≈ $
+                                    {amount_usd.toLocaleString("en-US", {
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                    })}{" "}
+                                    USDT)
+                                  </span>
+                                </span>
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -667,60 +811,209 @@ function AdminDashboardContent() {
                 <Card className="md:col-span-2">
                   <CardHeader>
                     <CardTitle className="text-sm font-medium">
-                      KYC Verification Documents
+                      KYC Verification
                     </CardTitle>
+                    <CardDescription>
+                      Submitted information and identity documents
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {kycDetails ? (
                       <div className="space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div className="space-y-2">
-                            <Label>ID Front</Label>
-                            <img
-                              src={kycDetails.id_front_url}
-                              alt="ID Front"
-                              className="w-full h-40 object-cover rounded-lg border"
-                            />
+                        {/* Submitted information */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-semibold text-foreground border-b pb-2">
+                              Personal details
+                            </h4>
+                            <dl className="grid grid-cols-1 gap-2 text-sm">
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Full name
+                                </dt>
+                                <dd className="font-medium text-right">
+                                  {kycDetails.full_name || "—"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Date of birth
+                                </dt>
+                                <dd className="font-medium text-right">
+                                  {kycDetails.date_of_birth
+                                    ? new Date(
+                                        kycDetails.date_of_birth,
+                                      ).toLocaleDateString()
+                                    : "—"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Nationality
+                                </dt>
+                                <dd className="font-medium text-right">
+                                  {kycDetails.nationality || "—"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Address
+                                </dt>
+                                <dd className="font-medium text-right">
+                                  {[
+                                    kycDetails.address_line,
+                                    kycDetails.city,
+                                    kycDetails.zip_code,
+                                    kycDetails.country,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ") || "—"}
+                                </dd>
+                              </div>
+                            </dl>
                           </div>
-                          <div className="space-y-2">
-                            <Label>ID Back</Label>
-                            <img
-                              src={kycDetails.id_back_url}
-                              alt="ID Back"
-                              className="w-full h-40 object-cover rounded-lg border"
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Selfie</Label>
-                            <img
-                              src={kycDetails.selfie_url}
-                              alt="Selfie"
-                              className="w-full h-40 object-cover rounded-lg border"
-                            />
+                          <div className="space-y-4">
+                            <h4 className="text-sm font-semibold text-foreground border-b pb-2">
+                              ID details
+                            </h4>
+                            <dl className="grid grid-cols-1 gap-2 text-sm">
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  ID type
+                                </dt>
+                                <dd className="font-medium text-right capitalize">
+                                  {kycDetails.id_type?.replace("_", " ") || "—"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  ID number
+                                </dt>
+                                <dd className="font-medium text-right font-mono">
+                                  {kycDetails.id_number || "—"}
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Status
+                                </dt>
+                                <dd>
+                                  <Badge
+                                    variant="outline"
+                                    className="capitalize"
+                                  >
+                                    {kycDetails.status?.replace("_", " ") ??
+                                      "—"}
+                                  </Badge>
+                                </dd>
+                              </div>
+                              <div className="flex justify-between gap-4">
+                                <dt className="text-muted-foreground">
+                                  Submitted
+                                </dt>
+                                <dd className="font-medium text-right">
+                                  {kycDetails.submitted_at
+                                    ? new Date(
+                                        kycDetails.submitted_at,
+                                      ).toLocaleString()
+                                    : "—"}
+                                </dd>
+                              </div>
+                              {kycDetails.reviewed_at && (
+                                <div className="flex justify-between gap-4">
+                                  <dt className="text-muted-foreground">
+                                    Reviewed at
+                                  </dt>
+                                  <dd className="font-medium text-right">
+                                    {new Date(
+                                      kycDetails.reviewed_at,
+                                    ).toLocaleString()}
+                                  </dd>
+                                </div>
+                              )}
+                              {kycDetails.rejection_reason && (
+                                <div className="col-span-full pt-2">
+                                  <dt className="text-muted-foreground text-xs mb-1">
+                                    Rejection reason
+                                  </dt>
+                                  <dd className="text-sm text-destructive bg-destructive/10 p-2 rounded">
+                                    {kycDetails.rejection_reason}
+                                  </dd>
+                                </div>
+                              )}
+                            </dl>
                           </div>
                         </div>
 
-                        <div className="flex gap-4">
-                          <Button
-                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() =>
-                              selectedUser?.id &&
-                              updateKycStatus(selectedUser.id, "verified")
-                            }
-                          >
-                            Approve KYC
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            className="flex-1 text-white"
-                            onClick={() =>
-                              selectedUser?.id &&
-                              updateKycStatus(selectedUser.id, "rejected")
-                            }
-                          >
-                            Reject KYC
-                          </Button>
+                        {/* Documents */}
+                        <div>
+                          <h4 className="text-sm font-semibold text-foreground border-b pb-2 mb-4">
+                            Documents
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label className="text-muted-foreground">
+                                ID Front
+                              </Label>
+                              <img
+                                src={kycDetails.id_front_url}
+                                alt="ID Front"
+                                className="w-full h-40 object-cover rounded-lg border"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-muted-foreground">
+                                ID Back
+                              </Label>
+                              {kycDetails.id_back_url ? (
+                                <img
+                                  src={kycDetails.id_back_url}
+                                  alt="ID Back"
+                                  className="w-full h-40 object-cover rounded-lg border"
+                                />
+                              ) : (
+                                <div className="w-full h-40 rounded-lg border bg-muted flex items-center justify-center text-muted-foreground text-sm">
+                                  Not provided
+                                </div>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label className="text-muted-foreground">
+                                Selfie
+                              </Label>
+                              <img
+                                src={kycDetails.selfie_url}
+                                alt="Selfie"
+                                className="w-full h-40 object-cover rounded-lg border"
+                              />
+                            </div>
+                          </div>
                         </div>
+
+                        {kycDetails.status !== "verified" &&
+                          kycDetails.status !== "approved" && (
+                          <div className="flex gap-4 pt-2">
+                            <Button
+                              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() =>
+                                selectedUser?.id &&
+                                updateKycStatus(selectedUser.id, "verified")
+                              }
+                            >
+                              Approve KYC
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              className="flex-1 text-white"
+                              onClick={() =>
+                                selectedUser?.id &&
+                                updateKycStatus(selectedUser.id, "rejected")
+                              }
+                            >
+                              Reject KYC
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
