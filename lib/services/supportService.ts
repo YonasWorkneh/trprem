@@ -197,15 +197,17 @@ export async function addSupportMessage(
   try {
     let imageUrl: string | undefined;
 
-    // Upload image if provided
+    // Upload image if provided (bucket: customer_support)
     if (messageData.image) {
-      const fileExt = messageData.image.name.split(".").pop();
-      const fileName = `support-message-${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-      const filePath = `support-messages/${fileName}`;
+      const fileExt = messageData.image.name.split(".").pop() ?? "jpg";
+      const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
-        .from("support")
-        .upload(filePath, messageData.image);
+        .from("customer_support")
+        .upload(fileName, messageData.image, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
       if (uploadError) {
         throw new Error(`Failed to upload image: ${uploadError.message}`);
@@ -213,7 +215,7 @@ export async function addSupportMessage(
 
       const {
         data: { publicUrl },
-      } = supabase.storage.from("support").getPublicUrl(filePath);
+      } = supabase.storage.from("customer_support").getPublicUrl(fileName);
 
       imageUrl = publicUrl;
     }
@@ -259,7 +261,10 @@ export async function updateTicketStatus(
   try {
     const { error } = await supabase
       .from("support_tickets")
-      .update({ status })
+      .update({
+        status,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", ticketId);
 
     if (error) {

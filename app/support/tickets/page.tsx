@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   MessageSquare,
@@ -22,6 +23,7 @@ type TicketFilter = "all" | "open" | "active" | "pending" | "closed";
 
 export default function SupportTicketsPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const [activeFilter, setActiveFilter] = useState<TicketFilter>("all");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -213,18 +215,17 @@ export default function SupportTicketsPage() {
       </main>
       <BottomNavigation />
 
-      {/* Chat UI Overlay */}
+      {/* Chat UI Overlay - TicketChat uses a dimmed overlay so tickets remain visible in background */}
       {selectedTicket && (
-        <div className="fixed inset-0 z-50 bg-white">
-          <TicketChat ticket={selectedTicket} onBack={handleBackToList} />
-        </div>
+        <TicketChat ticket={selectedTicket} onBack={handleBackToList} />
       )}
 
       <CreateTicketModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={() => {
-          // TODO: Refresh tickets list
+          setIsCreateModalOpen(false);
+          queryClient.invalidateQueries({ queryKey: ["support-tickets"] });
         }}
         userId={user?.id || ""}
       />

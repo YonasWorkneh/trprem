@@ -22,6 +22,8 @@ interface TicketChatProps {
 export default function TicketChat({ ticket, onBack }: TicketChatProps) {
   const { user } = useAuth();
   const [message, setMessage] = useState("");
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -36,19 +38,38 @@ export default function TicketChat({ ticket, onBack }: TicketChatProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Create/revoke preview URL for attached image
+  useEffect(() => {
+    if (attachedFile) {
+      const url = URL.createObjectURL(attachedFile);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [attachedFile]);
+
   const handleSendMessage = async () => {
-    if (!message.trim() || !user?.id) return;
+    if (!user?.id) return;
+    const hasMessage = message.trim().length > 0;
+    const hasImage = !!attachedFile;
+    if (!hasMessage && !hasImage) return;
 
     setIsSubmitting(true);
     try {
       const result = await addSupportMessage(user.id, {
         ticket_id: ticket.id,
-        message: message.trim(),
+        message: message.trim() || (hasImage ? "Shared an image" : ""),
+        image: attachedFile ?? undefined,
       });
 
       if (result.success) {
         setMessage("");
-        refetch(); // Refresh messages
+        setAttachedFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        refetch();
         toast.success("Message sent successfully");
       } else {
         toast.error(result.error || "Failed to send message");
@@ -68,33 +89,15 @@ export default function TicketChat({ ticket, onBack }: TicketChatProps) {
     }
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !user?.id) return;
+    if (file) setAttachedFile(file);
+    e.target.value = "";
+  };
 
-    setIsSubmitting(true);
-    try {
-      const result = await addSupportMessage(user.id, {
-        ticket_id: ticket.id,
-        message: "Shared an image",
-        image: file,
-      });
-
-      if (result.success) {
-        refetch(); // Refresh messages
-        toast.success("Image uploaded successfully");
-      } else {
-        toast.error(result.error || "Failed to upload image");
-      }
-    } catch (error) {
-      console.error("Upload image error:", error);
-      toast.error("Failed to upload image");
-    } finally {
-      setIsSubmitting(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }
+  const clearAttachedFile = () => {
+    setAttachedFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const getStatusColor = (status: string) => {
@@ -202,9 +205,6 @@ export default function TicketChat({ ticket, onBack }: TicketChatProps) {
                         src={msg.image_url}
                         alt="Shared image"
                         className="rounded-lg max-w-full h-auto max-h-[200px] object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = "/api/placeholder/300/200";
-                        }}
                       />
                       <p className="text-sm">{msg.message}</p>
                     </div>
@@ -241,18 +241,38 @@ export default function TicketChat({ ticket, onBack }: TicketChatProps) {
         </div>
 
         {/* Message Input */}
-        <div className="p-4 border-t border-gray-200 rounded-b-2xl">
+        <div className="p-4 border-t border-gray-200 rounded-b-2xl space-y-3">
+          {attachedFile && previewUrl && (
+            <div className="relative inline-block">
+              <img
+                src={previewUrl}
+                alt="Preview"
+                className="rounded-lg max-w-[200px] max-h-28 object-contain border border-gray-200"
+              />
+              <button
+                type="button"
+                onClick={clearAttachedFile}
+                className="absolute -top-1.5 -right-1.5 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer text-sm"
+                aria-label="Remove image"
+              >
+                ×
+              </button>
+              <p className="text-xs text-gray-500 mt-1 truncate max-w-[200px]">
+                {attachedFile.name}
+              </p>
+            </div>
+          )}
           <div className="flex items-end gap-3">
             <input
               type="file"
               ref={fileInputRef}
-              onChange={handleFileUpload}
+              onChange={handleFileSelect}
               accept="image/*"
               className="hidden"
             />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="p-3 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer"
+              className="p-3 text-gray-500 hover:text-gray-700 transition-colors cursor-pointer shrink-0"
               disabled={isSubmitting}
               aria-label="Attach image"
             >
@@ -271,8 +291,8 @@ export default function TicketChat({ ticket, onBack }: TicketChatProps) {
             </div>
             <button
               onClick={handleSendMessage}
-              disabled={!message.trim() || isSubmitting}
-              className="p-3 bg-[var(--theme-primary)] text-[var(--theme-primary-text)] rounded-xl hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              disabled={(!message.trim() && !attachedFile) || isSubmitting}
+              className="p-3 bg-[var(--theme-primary)] text-[var(--theme-primary-text)] rounded-xl hover:bg-[var(--theme-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shrink-0"
               aria-label="Send message"
             >
               {isSubmitting ? (

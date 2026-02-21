@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -34,8 +34,10 @@ import {
 import AdminEmptyState from "./AdminEmptyState";
 import { useAuthStore } from "@/lib/store/authStore";
 import { uploadSupportImage } from "@/lib/supportService";
+import { supabase } from "@/lib/supabase";
 
 const AdminSupportPanel = () => {
+  const queryClient = useQueryClient();
   const user = useAuthStore((state: any) => state.user);
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
@@ -46,6 +48,7 @@ const AdminSupportPanel = () => {
     "all" | "open" | "in_progress" | "resolved" | "closed"
   >("all");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Fetch tickets with React Query
   const {
@@ -94,10 +97,21 @@ const AdminSupportPanel = () => {
   }, [refetchTickets]);
 
   const handleSendReply = async () => {
-    if (!user?.id || !selectedTicket) return;
-
-    // Allow sending with just an image or just a message, but require at least one
-    if (!replyMessage.trim() && !imageFile) return;
+    const userId =
+      user?.id ??
+      (await supabase.auth.getSession()).data.session?.user?.id;
+    if (!userId) {
+      toast.error("Session expired", { description: "Please sign in again to send replies." });
+      return;
+    }
+    if (!selectedTicket) {
+      toast.error("No ticket selected", { description: "Select a ticket to reply to." });
+      return;
+    }
+    if (!replyMessage.trim() && !imageFile) {
+      toast.error("Message required", { description: "Enter a message or attach an image." });
+      return;
+    }
 
     setSending(true);
 
@@ -105,15 +119,19 @@ const AdminSupportPanel = () => {
       let imageUrl: string | undefined;
 
       if (imageFile) {
-        const uploadResult = await uploadSupportImage(user.id, imageFile);
-        if (uploadResult.success) {
-          imageUrl = uploadResult.url;
+        const uploadResult = await uploadSupportImage(userId, imageFile);
+        if (!uploadResult.success) {
+          toast.error("Image upload failed", {
+            description: uploadResult.error ?? "Please try again.",
+          });
+          return;
         }
+        imageUrl = uploadResult.url;
       }
 
       const result = await sendSupportMessage(
         selectedTicket.id,
-        user.id,
+        userId,
         replyMessage.trim() || "", // Allow empty message if image is present
         true, // is_admin_reply
         imageUrl,
@@ -122,6 +140,7 @@ const AdminSupportPanel = () => {
       if (result.success) {
         setReplyMessage("");
         setImageFile(null);
+        if (fileInputRef.current) fileInputRef.current.value = "";
         toast.success("Reply Sent", {
           description: "Your response has been sent to the user",
         });
@@ -151,8 +170,9 @@ const AdminSupportPanel = () => {
 
     if (result.success) {
       toast.success("Status Updated", {
-        description: `Ticket marked as ${status}`,
+        description: `Ticket marked as ${status.replace("_", " ")}`,
       });
+      queryClient.invalidateQueries({ queryKey: ["admin-support-tickets"] });
       await refetchTickets();
     } else {
       toast.error("Error", {
@@ -420,23 +440,25 @@ const AdminSupportPanel = () => {
                       </div>
                     )}
                     <div className="flex gap-2">
-                      <Input
+                      <input
+                        ref={fileInputRef}
                         type="file"
                         accept="image/*"
-                        onChange={(e) =>
-                          setImageFile(e.target.files?.[0] || null)
-                        }
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          setImageFile(file ?? null);
+                        }}
                         className="hidden"
                         id="admin-reply-image"
+                        aria-label="Attach image"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
-                        onClick={() =>
-                          document.getElementById("admin-reply-image")?.click()
-                        }
-                        title="Upload image"
+                        onClick={() => fileInputRef.current?.click()}
+                        title="Attach image"
+                        className="cursor-pointer"
                       >
                         <Upload className="h-4 w-4" />
                       </Button>
@@ -453,23 +475,25 @@ const AdminSupportPanel = () => {
                           }
                         }}
                       />
-                      <Button
-                        onClick={handleSendReply}
+                      <button
+                        type="button"
+                        onClick={() => handleSendReply()}
                         disabled={
                           sending || (!replyMessage.trim() && !imageFile)
                         }
                         title={
                           !replyMessage.trim() && !imageFile
                             ? "Enter a message or attach an image"
-                            : ""
+                            : "Send reply"
                         }
+                        className="inline-flex cursor-pointer h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-input bg-background ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-4"
                       >
                         {sending ? (
                           <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                           <Send className="h-4 w-4" />
                         )}
-                      </Button>
+                      </button>
                     </div>
                   </div>
                 </>

@@ -201,42 +201,50 @@ export async function updateTicketStatus(
     try {
         const { error } = await supabase
             .from('support_tickets')
-            .update({ status })
+            .update({
+                status,
+                updated_at: new Date().toISOString(),
+            })
             .eq('id', ticketId);
 
         if (error) throw error;
         return { success: true };
-    } catch (error:any) {
+    } catch (error: any) {
         console.error('Error updating ticket status:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error?.message ?? 'Failed to update status' };
     }
 }
 
+const SUPPORT_BUCKET = 'customer_support';
+
 /**
- * Upload support image
+ * Upload support image (customer or admin). Uses bucket "customer_support".
  */
 export async function uploadSupportImage(
     userId: string,
     file: File
 ): Promise<{ success: boolean; url?: string; error?: string }> {
     try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${userId}/${Date.now()}.${fileExt}`;
+        const fileExt = file.name.split('.').pop() ?? 'jpg';
+        const fileName = `${userId}/${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${fileExt}`;
 
         const { error: uploadError } = await supabase.storage
-            .from('support-images')
-            .upload(fileName, file);
+            .from(SUPPORT_BUCKET)
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false,
+            });
 
         if (uploadError) throw uploadError;
 
         const { data: { publicUrl } } = supabase.storage
-            .from('support-images')
+            .from(SUPPORT_BUCKET)
             .getPublicUrl(fileName);
 
         return { success: true, url: publicUrl };
-    } catch (error:any) {
+    } catch (error: any) {
         console.error('Error uploading support image:', error);
-        return { success: false, error: error.message };
+        return { success: false, error: error?.message ?? 'Upload failed' };
     }
 }
 
