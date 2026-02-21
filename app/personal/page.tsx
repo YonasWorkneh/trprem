@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import Header from "@/app/components/Header";
@@ -13,7 +12,7 @@ import ProfileSection from "@/app/components/profile/ProfileSection";
 import ProfileItem from "@/app/components/profile/ProfileItem";
 import { useAuth } from "@/lib/hooks/useAuth";
 import { getProfileData } from "@/lib/services/profileService";
-import { logout } from "@/lib/services/authService";
+import { logout, setLogoutFlag } from "@/lib/services/authService";
 import type { WalletBalance } from "@/lib/types/profile";
 
 function PersonIcon() {
@@ -126,7 +125,6 @@ function TrashIcon() {
 }
 
 export default function PersonalPage() {
-  const router = useRouter();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
   const [balance, setBalance] = useState<WalletBalance>({
     totalBalance: 0,
@@ -134,6 +132,7 @@ export default function PersonalPage() {
   });
   const [loading, setLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && user) {
@@ -168,15 +167,19 @@ export default function PersonalPage() {
   };
 
   const handleLogout = async () => {
-    const result = await logout();
-    if (result.success) {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      setLogoutFlag();
       toast.success("Logged out successfully");
-      router.push("/");
-      router.refresh();
-    } else {
-      toast.error("Logout failed", {
-        description: result.error || "Unable to log out",
-      });
+      window.location.href = "/";
+    } catch {
+      setLogoutFlag();
+      toast.success("Logged out successfully");
+      window.location.href = "/";
+    } finally {
+      setIsLoggingOut(false);
     }
   };
 
@@ -227,6 +230,7 @@ export default function PersonalPage() {
             onRefresh={handleRefresh}
             onLogout={handleLogout}
             isRefreshing={isRefreshing}
+            isLoggingOut={isLoggingOut}
           />
           <UserInfoCard profile={profile} userId={user.id} />
           <BalanceCard

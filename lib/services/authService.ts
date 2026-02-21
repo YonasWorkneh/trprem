@@ -2,7 +2,7 @@
 
 import { supabase } from "../supabase";
 import type { RegisterCredentials, AuthResult, Profile } from "../types/auth";
-import { setStoredAuth } from "../utils/authStorage";
+import { setStoredAuth, clearStoredAuth } from "../utils/authStorage";
 
 export async function loginWithEmail(
   email: string,
@@ -263,35 +263,53 @@ export async function resendConfirmationEmail(
   }
 }
 
+const LOGOUT_FLAG_KEY = "tp_just_logged_out";
+
+export function setLogoutFlag(): void {
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.setItem(LOGOUT_FLAG_KEY, "1");
+    } catch {
+      // ignore
+    }
+  }
+}
+
+export function clearLogoutFlag(): void {
+  if (typeof window !== "undefined") {
+    try {
+      sessionStorage.removeItem(LOGOUT_FLAG_KEY);
+    } catch {
+      // ignore
+    }
+  }
+}
+
+export function hasLogoutFlag(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return sessionStorage.getItem(LOGOUT_FLAG_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export async function logout(): Promise<{ success: boolean; error?: string }> {
   try {
+    // Always clear local auth first so the app treats the user as logged out
+    clearStoredAuth();
+
+    // Best-effort sign out with Supabase (may fail offline)
     const { error } = await supabase.auth.signOut();
-
-    // Clear localStorage on logout
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("tp_auth_token");
-      localStorage.removeItem("tp_auth_user");
-      localStorage.removeItem("tp_auth_profile");
-      localStorage.removeItem("tp_auth_timestamp");
-    }
-
     if (error) {
-      console.error("Logout error:", error);
-      return {
-        success: false,
-        error: error.message,
-      };
+      console.warn("Supabase signOut warning (user is still logged out locally):", error.message);
     }
 
-    return {
-      success: true,
-    };
+    // Always report success so the UI redirects; we've already cleared local state
+    return { success: true };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : "An unexpected error occurred",
-    };
+    console.warn("Logout caught error (user is still logged out locally):", error);
+    return { success: true };
   }
 }
 

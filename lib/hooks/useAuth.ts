@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import { supabase } from "../supabase";
 import type { User } from "@supabase/supabase-js";
 import type { Profile } from "../types/auth";
-import { getProfile } from "../services/authService";
+import { getProfile, hasLogoutFlag, clearLogoutFlag } from "../services/authService";
 import {
   getStoredAuth,
   setStoredAuth,
@@ -55,6 +55,18 @@ export function useAuth() {
         }
 
         if (userError || !currentUser) {
+          setUser(null);
+          setProfile(null);
+          clearStoredAuth();
+          setLoading(false);
+          isInitializedRef.current = true;
+          return;
+        }
+
+        // User just logged out: we cleared storage and set flag; don't restore from Supabase
+        if (hasLogoutFlag()) {
+          clearLogoutFlag();
+          supabase.auth.signOut().catch(() => {});
           setUser(null);
           setProfile(null);
           clearStoredAuth();
