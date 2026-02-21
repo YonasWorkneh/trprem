@@ -167,7 +167,11 @@ const AdminDepositsPanel = () => {
         console.error("Status update error:", error);
         toast.error("Failed to update status: " + error.message);
       }
+     else {
+      toast.error("Failed to update status: An unknown error occurred");
+      } 
     }
+  };
 
     if (isLoading) {
       return (
@@ -652,6 +656,5 @@ const AdminDepositsPanel = () => {
         </Dialog>
       </>
     );
-  };
 };
 export default AdminDepositsPanel;
