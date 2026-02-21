@@ -9,7 +9,6 @@ import TextInput from "@/app/components/auth/TextInput";
 import PhoneInput from "@/app/components/auth/PhoneInput";
 import PasswordInput from "@/app/components/auth/PasswordInput";
 import { useRegister } from "@/lib/hooks/useRegister";
-import { resendConfirmationEmail } from "@/lib/services/authService";
 import { ArrowLeftIcon } from "lucide-react";
 
 type RegisterMethod = "email" | "mobile";
@@ -23,8 +22,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [agreedToTerms, setAgreedToTerms] = useState(false);
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const [isResending, setIsResending] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
   const { register, loading, error: registerError } = useRegister();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -48,118 +46,42 @@ export default function RegisterPage() {
     );
 
     if (result) {
-      setShowConfirmation(true);
+      setShowWelcome(true);
     }
   };
 
-  const handleResendEmail = async () => {
-    if (!email) return;
-
-    setIsResending(true);
-    const resendResult = await resendConfirmationEmail(email);
-
-    if (resendResult.success) {
-      toast.success("Confirmation email sent", {
-        description: "Please check your inbox",
-      });
-    } else {
-      toast.error("Failed to resend email", {
-        description: resendResult.error || "Please try again later",
-      });
-    }
-
-    setIsResending(false);
-  };
-
-  if (showConfirmation) {
+  if (showWelcome) {
     return (
       <AuthLayout showFooter={false} showLogo={false}>
-        <div className="w-full max-w-md mx-auto">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-[rgba(244,208,63,0.1)] rounded-full mb-4">
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="text-[#F4D03F]"
-              >
-                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                <polyline points="22,6 12,13 2,6" />
-              </svg>
-            </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Check your {registerMethod === "email" ? "email" : "phone"}
-            </h1>
-            <p className="text-sm text-gray-600">
-              We&apos;ve sent a confirmation{" "}
-              {registerMethod === "email" ? "email" : "message"} to
-            </p>
-            <p className="text-sm font-medium text-gray-900 mt-1">
-              {registerMethod === "email" ? email : phone}
-            </p>
+        <div className="w-full max-w-md mx-auto text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-[var(--theme-primary)] rounded-full mb-6">
+            <svg
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-[var(--theme-primary-text)]"
+            >
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
           </div>
-
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-            <div className="space-y-4">
-              {[
-                {
-                  step: 1,
-                  title: `Open your ${registerMethod === "email" ? "email" : "messages"}`,
-                  description: "Look for a message from tradeprememium",
-                },
-                {
-                  step: 2,
-                  title: "Click the confirmation link",
-                  description: "This will verify your account and activate it",
-                },
-                {
-                  step: 3,
-                  title: "Return here to sign in",
-                  description: "Once confirmed, you can log in to your account",
-                },
-              ].map((item) => (
-                <div key={item.step} className="flex items-start gap-3">
-                  <div className="shrink-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center mt-0.5">
-                    <span className="text-[#F4D03F] text-xs font-bold">
-                      {item.step}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
-                      {item.title}
-                    </p>
-                    <p className="text-sm text-gray-600 mt-1">
-                      {item.description}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome!</h1>
+          <p className="text-gray-600 mb-8">
+            Your account has been created. You can sign in now to get started.
+          </p>
 
           <div className="space-y-3">
-            {registerMethod === "email" && (
-              <button
-                onClick={handleResendEmail}
-                disabled={isResending}
-                className="w-full bg-gray-100 text-gray-900 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isResending ? "Sending..." : "Resend confirmation email"}
-              </button>
-            )}
-
             <Link
               href="/login"
-              className="block w-full bg-[#F4D03F] text-yellow-900 py-3 rounded-lg font-medium hover:bg-[#F1C40F] transition-colors text-center"
+              className="block w-full bg-[var(--theme-primary)] text-[var(--theme-primary-text)] py-3 rounded-lg font-medium hover:bg-[var(--theme-primary-hover)] transition-colors text-center cursor-pointer"
             >
-              Go to Sign In
+              Sign in
             </Link>
-
             <Link
               href="/"
               className="w-full text-center text-sm text-gray-600 hover:text-gray-900 py-2 flex items-center justify-center gap-2 underline underline-offset-4"
@@ -167,19 +89,6 @@ export default function RegisterPage() {
               <ArrowLeftIcon className="w-4 h-4" />
               <span>Back to home</span>
             </Link>
-          </div>
-
-          <div className="mt-6 p-4 bg-[rgba(244,208,63,0.1)] rounded-lg border border-[rgba(244,208,63,0.2)]">
-            <p className="text-xs text-[#F1C40F]">
-              <strong>
-                Didn&apos;t receive the{" "}
-                {registerMethod === "email" ? "email" : "message"}?
-              </strong>
-              <br />
-              Check your spam folder or try resending. Make sure you entered
-              the correct{" "}
-              {registerMethod === "email" ? "email address" : "phone number"}.
-            </p>
           </div>
         </div>
       </AuthLayout>
@@ -267,7 +176,7 @@ export default function RegisterPage() {
                 type="checkbox"
                 checked={agreedToTerms}
                 onChange={(e) => setAgreedToTerms(e.target.checked)}
-                className="mt-1 w-4 h-4 text-[#F4D03F] border-gray-300 rounded focus:ring-[#F4D03F] focus:ring-2"
+                className="mt-1 w-4 h-4 text-[#F4D03F] border-gray-300 rounded focus:ring-[#F4D03F] focus:ring-2 accent-[#F4D03F]"
               />
               <span className="text-sm text-gray-700">
                 I have read and agree to the{" "}

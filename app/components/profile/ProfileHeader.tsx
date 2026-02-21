@@ -4,12 +4,14 @@ interface ProfileHeaderProps {
   onRefresh?: () => void;
   onLogout?: () => void;
   isRefreshing?: boolean;
+  isLoggingOut?: boolean;
 }
 
 export default function ProfileHeader({
   onRefresh,
   onLogout,
   isRefreshing = false,
+  isLoggingOut = false,
 }: ProfileHeaderProps) {
   return (
     <div className="flex items-center justify-between mb-6">
@@ -38,11 +40,9 @@ export default function ProfileHeader({
           </svg>
         </button>
         <button
-          onClick={()=>{
-            console.log("log out button clicked");
-            onLogout?.();
-          }}
-          className="p-2 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
+          onClick={() => onLogout?.()}
+          disabled={isLoggingOut}
+          className="p-2 hover:bg-red-50 rounded-lg transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Logout"
         >
           <svg
