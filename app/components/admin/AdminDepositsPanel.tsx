@@ -162,105 +162,130 @@ const AdminDepositsPanel = () => {
       }
 
       refetchDeposits();
-    } catch (error: any) {
-      console.error("Status update error:", error);
-      toast.error("Failed to update status: " + error.message);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Status update error:", error);
+        toast.error("Failed to update status: " + error.message);
+      }
     }
-  };
 
-  if (isLoading) {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center p-8">
+          <Loader2 className="animate-spin" />
+        </div>
+      );
+    }
+
     return (
-      <div className="flex justify-center p-8">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <Card className="border-border bg-card shadow-lg">
-        <CardHeader className="border-b border-border/50 bg-muted/20">
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <ArrowDownCircle className="w-5 h-5 text-primary" />
-              Deposit Requests
-              <Badge variant="secondary" className="ml-2">
-                {
-                  deposits.filter(
-                    (d) => d.status === "pending" || d.status === "reported",
-                  ).length
-                }{" "}
-                Pending
-              </Badge>
-            </CardTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => refetchDeposits()}
-              disabled={isRefreshing}
-            >
-              <RefreshCw
-                className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          {/* Desktop Table View - Hidden on mobile */}
-          <div className="hidden md:block">
-            <Table>
-              <TableHeader className="bg-muted/50">
-                <TableRow>
-                  <TableHead className="pl-6">User</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Currency / Address</TableHead>
-                  <TableHead>TX Hash / Proof</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right pr-6">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {deposits.map((deposit) => (
-                  <TableRow
-                    key={deposit.id}
-                    className="hover:bg-muted/30 transition-colors"
-                  >
-                    <TableCell className="pl-6 font-medium">
-                      <div>
-                        <div className="font-semibold">
-                          {deposit.user?.name || "Unknown User"}
+      <>
+        <Card className="border-border bg-card shadow-lg">
+          <CardHeader className="border-b border-border/50 bg-muted/20">
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center gap-2">
+                <ArrowDownCircle className="w-5 h-5 text-primary" />
+                Deposit Requests
+                <Badge variant="secondary" className="ml-2">
+                  {
+                    deposits.filter(
+                      (d) => d.status === "pending" || d.status === "reported",
+                    ).length
+                  }{" "}
+                  Pending
+                </Badge>
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => refetchDeposits()}
+                disabled={isRefreshing}
+              >
+                <RefreshCw
+                  className={`w-4 h-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            {/* Desktop Table View - Hidden on mobile */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader className="bg-muted/50">
+                  <TableRow>
+                    <TableHead className="pl-6">User</TableHead>
+                    <TableHead>Amount</TableHead>
+                    <TableHead>Currency / Address</TableHead>
+                    <TableHead>TX Hash / Proof</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="text-right pr-6">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {deposits.map((deposit) => (
+                    <TableRow
+                      key={deposit.id}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <TableCell className="pl-6 font-medium">
+                        <div>
+                          <div className="font-semibold">
+                            {deposit.user?.name || "Unknown User"}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {deposit.user?.email || "No Email"}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground mt-1 font-mono">
+                            {deposit.deposit_code}
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {deposit.user?.email || "No Email"}
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-mono font-bold">
+                          $
+                          {deposit.amount_usd?.toFixed(2) ||
+                            deposit.amount?.toFixed(2)}
                         </div>
-                        <div className="text-[10px] text-muted-foreground mt-1 font-mono">
-                          {deposit.deposit_code}
+                        {deposit.amount_usd !== deposit.amount && (
+                          <div className="text-xs text-muted-foreground">
+                            {deposit.amount} {deposit.currency}
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm">
+                          <span className="font-semibold">
+                            {deposit.currency}
+                          </span>
+                          {deposit.deposit_address && (
+                            <div className="flex items-center gap-2 mt-1">
+                              <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all max-w-[150px] truncate">
+                                {deposit.deposit_address}
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(
+                                    deposit.deposit_address,
+                                  );
+                                  toast.success("Address copied");
+                                }}
+                                title="Copy Address"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-mono font-bold">
-                        $
-                        {deposit.amount_usd?.toFixed(2) ||
-                          deposit.amount?.toFixed(2)}
-                      </div>
-                      {deposit.amount_usd !== deposit.amount && (
-                        <div className="text-xs text-muted-foreground">
-                          {deposit.amount} {deposit.currency}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm">
-                        <span className="font-semibold">
-                          {deposit.currency}
-                        </span>
-                        {deposit.deposit_address && (
-                          <div className="flex items-center gap-2 mt-1">
-                            <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all max-w-[150px] truncate">
-                              {deposit.deposit_address}
+                      </TableCell>
+                      <TableCell>
+                        {deposit.transaction_hash ? (
+                          <div className="flex items-center gap-2">
+                            <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all max-w-[120px] truncate">
+                              {deposit.transaction_hash}
                             </div>
                             <Button
                               variant="ghost"
@@ -268,243 +293,190 @@ const AdminDepositsPanel = () => {
                               className="h-6 w-6"
                               onClick={() => {
                                 navigator.clipboard.writeText(
-                                  deposit.deposit_address,
+                                  deposit.transaction_hash!,
                                 );
-                                toast.success("Address copied");
+                                toast.success("TX hash copied");
                               }}
-                              title="Copy Address"
+                              title="Copy TX Hash"
                             >
                               <Copy className="h-3 w-3" />
                             </Button>
                           </div>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {deposit.transaction_hash ? (
-                        <div className="flex items-center gap-2">
-                          <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-1 rounded select-all max-w-[120px] truncate">
-                            {deposit.transaction_hash}
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-6 w-6"
-                            onClick={() => {
-                              navigator.clipboard.writeText(
-                                deposit.transaction_hash!,
-                              );
-                              toast.success("TX hash copied");
-                            }}
-                            title="Copy TX Hash"
-                          >
-                            <Copy className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">
-                          N/A
-                        </span>
-                      )}
-                      {deposit.screenshot_url && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="mt-2 text-xs flex items-center gap-1 h-6 w-full justify-center"
-                          onClick={() => {
-                            setSelectedProof(deposit.screenshot_url!);
-                            setImageError(false);
-                          }}
-                        >
-                          <FileText className="w-3 h-3" />
-                          View Proof
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {new Date(deposit.created_at).toLocaleDateString()}
-                        <div className="text-xs opacity-70">
-                          {new Date(deposit.created_at).toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge
-                        className={`capitalize ${
-                          deposit.status === "credited" ||
-                          deposit.status === "confirmed"
-                            ? "bg-green-500/15 text-green-600 border-green-200"
-                            : deposit.status === "pending" ||
-                                deposit.status === "reported"
-                              ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                              : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
-                        variant="outline"
-                      >
-                        {deposit.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      {(deposit.status === "pending" ||
-                        deposit.status === "reported") && (
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                            onClick={() =>
-                              handleStatusUpdate(deposit, "reject")
-                            }
-                            title="Reject"
-                          >
-                            <XCircle className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
-                            onClick={() =>
-                              handleStatusUpdate(deposit, "approve")
-                            }
-                            title="Approve & Credit"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {deposits.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={7} className="p-0">
-                      <AdminEmptyState
-                        title="No deposit requests found"
-                        description="When users make deposit requests, they will appear here for your review and approval."
-                        icon={ArrowDownCircle}
-                      />
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile Card View - Visible only on mobile */}
-          <div className="md:hidden space-y-4 p-4">
-            {deposits.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-                <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
-                  <ArrowDownCircle className="w-8 h-8 opacity-20" />
-                </div>
-                <p className="text-lg font-medium">No deposit requests found</p>
-              </div>
-            ) : (
-              deposits.map((deposit) => (
-                <Card
-                  key={deposit.id}
-                  className="border-border bg-card hover:border-primary/50 transition-colors"
-                >
-                  <CardContent className="p-4 space-y-4">
-                    {/* Header Section */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-foreground truncate">
-                          {deposit.user?.name || "Unknown User"}
-                        </div>
-                        <div className="text-xs text-muted-foreground truncate">
-                          {deposit.user?.email || "No Email"}
-                        </div>
-                        <div className="text-[10px] text-muted-foreground mt-1 font-mono">
-                          {deposit.deposit_code}
-                        </div>
-                      </div>
-                      <Badge
-                        className={`capitalize flex-shrink-0 ${
-                          deposit.status === "credited" ||
-                          deposit.status === "confirmed"
-                            ? "bg-green-500/15 text-green-600 border-green-200"
-                            : deposit.status === "pending" ||
-                                deposit.status === "reported"
-                              ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
-                              : "bg-red-500/15 text-red-600 border-red-200"
-                        }`}
-                        variant="outline"
-                      >
-                        {deposit.status}
-                      </Badge>
-                    </div>
-
-                    {/* Amount Section */}
-                    <div className="pt-2 border-t border-border">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          Amount
-                        </span>
-                        <div className="text-right">
-                          <div className="font-mono font-bold text-foreground">
-                            $
-                            {deposit.amount_usd?.toFixed(2) ||
-                              deposit.amount?.toFixed(2)}
-                          </div>
-                          {deposit.amount_usd !== deposit.amount && (
-                            <div className="text-xs text-muted-foreground">
-                              {deposit.amount} {deposit.currency}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Currency & Address Section */}
-                    <div className="space-y-2 pt-2 border-t border-border">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          Currency
-                        </span>
-                        <span className="text-sm font-semibold">
-                          {deposit.currency}
-                        </span>
-                      </div>
-                      {deposit.deposit_address && (
-                        <div className="space-y-1">
+                        ) : (
                           <span className="text-xs text-muted-foreground">
-                            Address
+                            N/A
                           </span>
-                          <div className="flex items-center gap-2">
-                            <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
-                              {deposit.deposit_address}
-                            </div>
+                        )}
+                        {deposit.screenshot_url && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="mt-2 text-xs flex items-center gap-1 h-6 w-full justify-center"
+                            onClick={() => {
+                              setSelectedProof(deposit.screenshot_url!);
+                              setImageError(false);
+                            }}
+                          >
+                            <FileText className="w-3 h-3" />
+                            View Proof
+                          </Button>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="text-sm text-muted-foreground">
+                          {new Date(deposit.created_at).toLocaleDateString()}
+                          <div className="text-xs opacity-70">
+                            {new Date(deposit.created_at).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          className={`capitalize ${
+                            deposit.status === "credited" ||
+                            deposit.status === "confirmed"
+                              ? "bg-green-500/15 text-green-600 border-green-200"
+                              : deposit.status === "pending" ||
+                                  deposit.status === "reported"
+                                ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                                : "bg-red-500/15 text-red-600 border-red-200"
+                          }`}
+                          variant="outline"
+                        >
+                          {deposit.status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right pr-6">
+                        {(deposit.status === "pending" ||
+                          deposit.status === "reported") && (
+                          <div className="flex justify-end gap-2">
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 flex-shrink-0"
-                              onClick={() => {
-                                navigator.clipboard.writeText(
-                                  deposit.deposit_address,
-                                );
-                                toast.success("Address copied");
-                              }}
-                              title="Copy Address"
+                              size="sm"
+                              variant="outline"
+                              className="h-8 w-8 p-0 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                              onClick={() =>
+                                handleStatusUpdate(deposit, "reject")
+                              }
+                              title="Reject"
                             >
-                              <Copy className="h-4 w-4" />
+                              <XCircle className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              size="sm"
+                              className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white"
+                              onClick={() =>
+                                handleStatusUpdate(deposit, "approve")
+                              }
+                              title="Approve & Credit"
+                            >
+                              <CheckCircle className="w-4 h-4" />
                             </Button>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {deposits.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={7} className="p-0">
+                        <AdminEmptyState
+                          title="No deposit requests found"
+                          description="When users make deposit requests, they will appear here for your review and approval."
+                          icon={ArrowDownCircle}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
 
-                    {/* TX Hash / Proof Section */}
-                    {(deposit.transaction_hash || deposit.screenshot_url) && (
+            {/* Mobile Card View - Visible only on mobile */}
+            <div className="md:hidden space-y-4 p-4">
+              {deposits.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                  <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mb-4">
+                    <ArrowDownCircle className="w-8 h-8 opacity-20" />
+                  </div>
+                  <p className="text-lg font-medium">
+                    No deposit requests found
+                  </p>
+                </div>
+              ) : (
+                deposits.map((deposit) => (
+                  <Card
+                    key={deposit.id}
+                    className="border-border bg-card hover:border-primary/50 transition-colors"
+                  >
+                    <CardContent className="p-4 space-y-4">
+                      {/* Header Section */}
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-semibold text-foreground truncate">
+                            {deposit.user?.name || "Unknown User"}
+                          </div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {deposit.user?.email || "No Email"}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground mt-1 font-mono">
+                            {deposit.deposit_code}
+                          </div>
+                        </div>
+                        <Badge
+                          className={`capitalize flex-shrink-0 ${
+                            deposit.status === "credited" ||
+                            deposit.status === "confirmed"
+                              ? "bg-green-500/15 text-green-600 border-green-200"
+                              : deposit.status === "pending" ||
+                                  deposit.status === "reported"
+                                ? "bg-yellow-500/15 text-yellow-600 border-yellow-200"
+                                : "bg-red-500/15 text-red-600 border-red-200"
+                          }`}
+                          variant="outline"
+                        >
+                          {deposit.status}
+                        </Badge>
+                      </div>
+
+                      {/* Amount Section */}
+                      <div className="pt-2 border-t border-border">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            Amount
+                          </span>
+                          <div className="text-right">
+                            <div className="font-mono font-bold text-foreground">
+                              $
+                              {deposit.amount_usd?.toFixed(2) ||
+                                deposit.amount?.toFixed(2)}
+                            </div>
+                            {deposit.amount_usd !== deposit.amount && (
+                              <div className="text-xs text-muted-foreground">
+                                {deposit.amount} {deposit.currency}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Currency & Address Section */}
                       <div className="space-y-2 pt-2 border-t border-border">
-                        {deposit.transaction_hash && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-muted-foreground">
+                            Currency
+                          </span>
+                          <span className="text-sm font-semibold">
+                            {deposit.currency}
+                          </span>
+                        </div>
+                        {deposit.deposit_address && (
                           <div className="space-y-1">
                             <span className="text-xs text-muted-foreground">
-                              TX Hash
+                              Address
                             </span>
                             <div className="flex items-center gap-2">
                               <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
-                                {deposit.transaction_hash}
+                                {deposit.deposit_address}
                               </div>
                               <Button
                                 variant="ghost"
@@ -512,139 +484,174 @@ const AdminDepositsPanel = () => {
                                 className="h-8 w-8 flex-shrink-0"
                                 onClick={() => {
                                   navigator.clipboard.writeText(
-                                    deposit.transaction_hash!,
+                                    deposit.deposit_address,
                                   );
-                                  toast.success("TX hash copied");
+                                  toast.success("Address copied");
                                 }}
-                                title="Copy TX Hash"
+                                title="Copy Address"
                               >
                                 <Copy className="h-4 w-4" />
                               </Button>
                             </div>
                           </div>
                         )}
-                        {deposit.screenshot_url && (
+                      </div>
+
+                      {/* TX Hash / Proof Section */}
+                      {(deposit.transaction_hash || deposit.screenshot_url) && (
+                        <div className="space-y-2 pt-2 border-t border-border">
+                          {deposit.transaction_hash && (
+                            <div className="space-y-1">
+                              <span className="text-xs text-muted-foreground">
+                                TX Hash
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <div className="text-xs text-muted-foreground font-mono bg-muted/50 p-2 rounded select-all break-all">
+                                  {deposit.transaction_hash}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-8 w-8 flex-shrink-0"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(
+                                      deposit.transaction_hash!,
+                                    );
+                                    toast.success("TX hash copied");
+                                  }}
+                                  title="Copy TX Hash"
+                                >
+                                  <Copy className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          )}
+                          {deposit.screenshot_url && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full text-xs flex items-center justify-center gap-2"
+                              onClick={() => {
+                                setSelectedProof(deposit.screenshot_url!);
+                                setImageError(false);
+                              }}
+                            >
+                              <FileText className="w-4 h-4" />
+                              View Proof
+                            </Button>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Date Section */}
+                      <div className="flex items-center justify-between pt-2 border-t border-border">
+                        <span className="text-xs text-muted-foreground">
+                          Date
+                        </span>
+                        <div className="text-right">
+                          <div className="text-sm text-muted-foreground">
+                            {new Date(deposit.created_at).toLocaleDateString()}
+                          </div>
+                          <div className="text-xs opacity-70">
+                            {new Date(deposit.created_at).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons */}
+                      {(deposit.status === "pending" ||
+                        deposit.status === "reported") && (
+                        <div className="flex gap-2 pt-2">
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="w-full text-xs flex items-center justify-center gap-2"
-                            onClick={() => {
-                              setSelectedProof(deposit.screenshot_url!);
-                              setImageError(false);
-                            }}
+                            variant="outline"
+                            className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
+                            onClick={() =>
+                              handleStatusUpdate(deposit, "reject")
+                            }
                           >
-                            <FileText className="w-4 h-4" />
-                            View Proof
+                            <XCircle className="w-4 h-4 mr-2" />
+                            Reject
                           </Button>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Date Section */}
-                    <div className="flex items-center justify-between pt-2 border-t border-border">
-                      <span className="text-xs text-muted-foreground">
-                        Date
-                      </span>
-                      <div className="text-right">
-                        <div className="text-sm text-muted-foreground">
-                          {new Date(deposit.created_at).toLocaleDateString()}
+                          <Button
+                            size="sm"
+                            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() =>
+                              handleStatusUpdate(deposit, "approve")
+                            }
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Approve
+                          </Button>
                         </div>
-                        <div className="text-xs opacity-70">
-                          {new Date(deposit.created_at).toLocaleTimeString()}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    {(deposit.status === "pending" ||
-                      deposit.status === "reported") && (
-                      <div className="flex gap-2 pt-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-200"
-                          onClick={() => handleStatusUpdate(deposit, "reject")}
-                        >
-                          <XCircle className="w-4 h-4 mr-2" />
-                          Reject
-                        </Button>
-                        <Button
-                          size="sm"
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                          onClick={() => handleStatusUpdate(deposit, "approve")}
-                        >
-                          <CheckCircle className="w-4 h-4 mr-2" />
-                          Approve
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Dialog
-        open={!!selectedProof}
-        onOpenChange={(open) => !open && setSelectedProof(null)}
-      >
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Proof of Payment</DialogTitle>
-          </DialogHeader>
-          {selectedProof && (
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-black/5">
-              {!imageError ? (
-                <img
-                  src={selectedProof}
-                  alt="Proof of Payment"
-                  className="object-contain w-full h-full"
-                  onError={() => setImageError(true)}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  <div className="text-center">
-                    <svg
-                      className="w-12 h-12 mx-auto mb-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                    <p className="text-sm">Image cannot be displayed</p>
-                    <button
-                      onClick={() => window.open(selectedProof, "_blank")}
-                      className="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                    >
-                      Open Original
-                    </button>
-                  </div>
-                </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))
               )}
-              <div className="absolute top-2 right-2">
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => window.open(selectedProof, "_blank")}
-                >
-                  <ExternalLink className="w-4 h-4 mr-1" />
-                  Open Original
-                </Button>
-              </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
+          </CardContent>
+        </Card>
 
+        <Dialog
+          open={!!selectedProof}
+          onOpenChange={(open) => !open && setSelectedProof(null)}
+        >
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Proof of Payment</DialogTitle>
+            </DialogHeader>
+            {selectedProof && (
+              <div className="relative aspect-video w-full overflow-hidden rounded-lg border bg-black/5">
+                {!imageError ? (
+                  <img
+                    src={selectedProof}
+                    alt="Proof of Payment"
+                    className="object-contain w-full h-full"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    <div className="text-center">
+                      <svg
+                        className="w-12 h-12 mx-auto mb-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <p className="text-sm">Image cannot be displayed</p>
+                      <button
+                        onClick={() => window.open(selectedProof, "_blank")}
+                        className="mt-2 px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                      >
+                        Open Original
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div className="absolute top-2 right-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => window.open(selectedProof, "_blank")}
+                  >
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    Open Original
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </>
+    );
+  };
+};
 export default AdminDepositsPanel;

@@ -32,13 +32,13 @@ import {
   X,
 } from "lucide-react";
 import AdminEmptyState from "./AdminEmptyState";
-import { useAuthStore } from "@/lib/store/authStore";
+import { useAuthStore, User } from "@/lib/store/authStore";
 import { uploadSupportImage } from "@/lib/supportService";
 import { supabase } from "@/lib/supabase";
 
 const AdminSupportPanel = () => {
   const queryClient = useQueryClient();
-  const user = useAuthStore((state: any) => state.user);
+  const user = useAuthStore((state: { user: User | null }) => state.user);
 
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -153,10 +153,16 @@ const AdminSupportPanel = () => {
       } else {
         throw new Error(result.error || "Failed to send reply");
       }
-    } catch (error: any) {
-      toast.error("Error", {
-        description: error.message,
-      });
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error("Error", {
+          description: error.message,
+        });
+      } else {
+        toast.error("Error", {
+          description: "An unknown error occurred",
+        });
+      }
     } finally {
       setSending(false);
     }
