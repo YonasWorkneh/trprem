@@ -23,6 +23,10 @@ import {
   createDepositRequest,
   uploadDepositProof,
 } from "@/lib/services/depositService";
+import {
+  fetchCryptoRates,
+  type CryptoRates,
+} from "@/lib/services/priceService";
 import UploadProofModal from "@/app/components/deposit/UploadProofModal";
 import {
   Select,
@@ -166,7 +170,21 @@ function DepositContent() {
   const [uploadedProof, setUploadedProof] = useState<File | null>(null);
   const [uploadedProofUrl, setUploadedProofUrl] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [conversionRates, setConversionRates] = useState<CryptoRates | null>(
+    null,
+  );
   const qrCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Fetch live crypto→USD rates for estimated USDT
+  useEffect(() => {
+    let cancelled = false;
+    fetchCryptoRates().then(({ rates }) => {
+      if (!cancelled) setConversionRates(rates);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Mock wallet addresses - in production, fetch from API
   const mockAddresses: Record<string, string> = {
@@ -215,19 +233,17 @@ function DepositContent() {
     }
   }, [walletAddress]);
 
-  // Calculate estimated USDT (mock conversion rate)
+  // Calculate estimated USDT using live conversion rates
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const conversionRates: Record<string, number> = {
-        ETH: 3000,
-        BTC: 45000,
-        USDT: 1,
-      };
-      const rate = conversionRates[selectedCurrency] || 1;
-      setEstimatedUSDT(parseFloat(depositAmount) * rate);
-    }, 0);
-    return () => clearTimeout(timeoutId);
-  }, [depositAmount, selectedCurrency]);
+    const amount = Number.parseFloat(depositAmount) || 0;
+    const rate =
+      conversionRates && selectedCurrency in conversionRates
+        ? conversionRates[selectedCurrency as keyof CryptoRates]
+        : selectedCurrency === "USDT"
+          ? 1
+          : 0;
+    setEstimatedUSDT(amount * (rate || 0));
+  }, [depositAmount, selectedCurrency, conversionRates]);
 
   const handleCopyAddress = async () => {
     if (!walletAddress) return;
@@ -496,6 +512,13 @@ function DepositContent() {
                   })}{" "}
                   USDT
                 </div>
+                {selectedCurrency !== "USDT" && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    {conversionRates
+                      ? "Using live conversion rates"
+                      : "Loading rates…"}
+                  </p>
+                )}
               </div>
 
               {/* Deposit Address Card */}
